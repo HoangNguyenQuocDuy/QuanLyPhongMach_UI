@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "QLPM",
+    "slug": "QLPM",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "QLPM"
+}
