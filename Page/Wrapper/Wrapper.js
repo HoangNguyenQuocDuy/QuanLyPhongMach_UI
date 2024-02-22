@@ -8,10 +8,9 @@ import UserInfo from "../../components/UserInfo/UserInfo";
 import AddUserBox from "../../components/AddUserBox/AddUserBox";
 import ManageStaff from "../Admin/Admin";
 import Schedule from "../Schedule/Schedule";
-import { View } from "react-native";
-import { Touchable } from "react-native";
 import LogoutScreen from "../../components/LogoutScreen/LogoutScreen";
 import ScheduleInfo from "../../components/ScheduleInfo/ScheduleInfo";
+import AddScheduleBox from "../../components/AddScheduleBox/AddScheduleBox";
 
 
 const Drawer = createDrawerNavigator();
@@ -19,7 +18,9 @@ const Drawer = createDrawerNavigator();
 function Wrapper() {
   const user = useSelector(state => state.user)
   const account = useSelector(state => state.account)
-  const { isOpenUserInfoTag, isOpenAddUserBox, isOpenScheduleInfo } = useSelector(state => state.app)
+  const { isOpenUserInfoTag, isOpenAddUserBox, isOpenScheduleInfo,
+    isOpenAddScheduleBox }
+    = useSelector(state => state.app)
 
   return (
     <>
@@ -64,6 +65,7 @@ function Wrapper() {
       {isOpenUserInfoTag && <UserInfo />}
       {isOpenAddUserBox && <AddUserBox />}
       {isOpenScheduleInfo && <ScheduleInfo />}
+      {isOpenAddScheduleBox && <AddScheduleBox />}
     </>
   );
 }

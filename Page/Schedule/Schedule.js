@@ -8,14 +8,15 @@ import ScheduleItem from '../../components/ScheduleItem/ScheduleItem';
 import { useDebounce } from 'use-debounce';
 import moment from 'moment';
 import newRequest from '../../ultils/request';
+import { setIsLoadSchedulesSearched, setScheduleIdActive, toggleIsOpenAddScheduleBox } from '../../store/slice/appSlice';
 
 const Schedule = () => {
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
   const [searchScheduleValue, setSearchScheduleValue] = useState('')
-  const [debouncedSearchDoctorValue] = useDebounce(searchScheduleValue, 1000);
+  const [debouncedSearchScheduleValue] = useDebounce(searchScheduleValue, 2000);
+  const [prevDebounce, setPrevDebounce] = useState(debouncedSearchScheduleValue)
   const { access_token } = useSelector(state => state.account)
   const [isFetchedSchedulesToday, setIsFetchedSchedulesToday] = useState(false)
   const [schedulesTodday, setSchedulesToday] = useState([])
@@ -23,6 +24,12 @@ const Schedule = () => {
   const [searchedSchedules, setSearchedSchedules] = useState([])
   const [page, setPage] = useState(1)
   const [isNext, setIsNext] = useState(true)
+  const [isFetch, setIsFetch] = useState(false)
+  const { isOpenScheduleInfo, isLoadSchedulesSearched
+    , showConfirmation, isOpenAddScheduleBox }
+    = useSelector(state => state.app)
+  const [isFirstFetchSchedule, setIsFirstFetchSchedule] = useState(false)
+  const schedules = useSelector(state => state.schedules)
 
   const handleFetchSchedule = ({ access_token, date }) => {
     dispatch(fetchSchedulesData({ access_token, date }))
@@ -45,28 +52,60 @@ const Schedule = () => {
     if (layoutMeasurement.height + contentOffset.y >=
       contentSize.height - paddingToBottom) {
       loadNewSchedules()
-      console.log('Cuộn đến cuối trang, tải thêm dữ liệu');
-      // console.log('schedules.result ', schedules.results)
-      // Gọi hàm để tải thêm dữ liệu
-      // loadNextPage();
+    }
+  }
+
+  const findSchedules = async () => {
+    if (!isFetch) {
+      let timeArr = debouncedSearchScheduleValue.split('/')
+      if (timeArr[timeArr.length - 1] === '') timeArr.pop()
+      const timeSearchFormat = timeArr.join('-')
+      const handleGetSearchSchedules = async () => {
+        console.log('timeSearchFormat ', timeSearchFormat)
+        await newRequest.get(`/schedules/?date=${timeSearchFormat}&page=1`, {
+          headers: {
+            'Authorization': `Bearer ${access_token}`
+          }
+        })
+          .then(data => {
+            dispatch(addNewSchedules(data.data))
+            setSearchedSchedules([...data.data.results])
+            console.log([...data.data.results])
+            setIsLoading(false)
+            setIsFetch(true)
+            if (data.data.next) {
+              setPage(2)
+              setIsNext(true)
+            } else {
+              setIsNext(false)
+            }
+          })
+          .catch(err => {
+            setIsLoading(false)
+            console.log('Error when get schedules from page number: ', err)
+          })
+      }
+      handleGetSearchSchedules()
     }
   }
 
   const loadNewSchedules = async () => {
-    if (searchScheduleValue !== '') {
+    if (debouncedSearchScheduleValue !== '') {
+      console.log('page ', page)
       if (isNext) {
-        let timeArr = searchScheduleValue.split('/')
+        setIsLoading(true)
+        let timeArr = debouncedSearchScheduleValue.split('/')
         if (timeArr[timeArr.length - 1] === '') timeArr.pop()
         const timeSearchFormat = timeArr.join('-')
         const handleGetSearchSchedules = async () => {
-          console.log(timeSearchFormat)
+          console.log('timeSearchFormat ', timeSearchFormat)
           await newRequest.get(`/schedules/?date=${timeSearchFormat}&page=${page}`, {
             headers: {
               'Authorization': `Bearer ${access_token}`
             }
           })
             .then(data => {
-              console.log('data.data, page: ', page, data.data)
+              dispatch(addNewSchedules(data.data))
               setSearchedSchedules(state => {
                 const exitingIds = state.map(schedule => schedule.id)
                 const newSchedules = data.data.results.filter(
@@ -79,7 +118,8 @@ const Schedule = () => {
                   ...newSchedules
                 ]
               })
-              dispatch(addNewSchedules(data.data))
+              setIsFirstFetchSchedule(true)
+              setIsLoading(false)
               if (data.data.next) {
                 setPage(page + 1)
                 setIsNext(true)
@@ -88,10 +128,13 @@ const Schedule = () => {
               }
             })
             .catch(err => {
+              setIsLoading(false)
               console.log('Error when get schedules from page number: ', err)
             })
         }
         handleGetSearchSchedules()
+      } else {
+        setIsLoading(false)
       }
     }
   }
@@ -101,22 +144,25 @@ const Schedule = () => {
       let todayFetch = format((new Date()), 'yyyy-MM-dd')
       handleFetchSchedule({ access_token, date: todayFetch })
     }
-    loadNewSchedules()
-  }, [debouncedSearchDoctorValue])
+    setIsFetch(false)
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+    if (debouncedSearchScheduleValue !== ''
+      && !isOpenScheduleInfo && !isOpenAddScheduleBox) {
+      console.log('debouncedSearchScheduleValue ', debouncedSearchScheduleValue)
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+      findSchedules()
+    } else if (!isOpenScheduleInfo && isLoadSchedulesSearched && !showConfirmation) {
+      const exitIds = searchedSchedules.map(schedule => schedule.id)
+      const loadSchedules = schedules.results.filter(schedule => exitIds.includes(schedule.id))
 
-  const handleConfirm = (date) => {
-    console.log(date)
-    setSelectedDate(date);
-    hideDatePicker();
-  };
+      setSearchedSchedules([...loadSchedules])
+      dispatch(setIsLoadSchedulesSearched(false))
+    }
+    // if (debouncedSearchScheduleValue===''){
+    //   setSearchedSchedules([])
+    // }
+  }, [debouncedSearchScheduleValue, isOpenScheduleInfo, isOpenAddScheduleBox,
+    searchedSchedules, isLoadSchedulesSearched, showConfirmation])
 
   return (
     <ScrollView style={[{ height: '100%', backgroundColor: '#fff', }]}
@@ -137,7 +183,11 @@ const Schedule = () => {
               backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
               display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
               borderRadius: 8
-            }]}>
+            }]}
+              onPress={() => {
+                dispatch(toggleIsOpenAddScheduleBox())
+              }}
+            >
               <Icons name='plus' size={20} color={'white'} />
               <Text style={[{ fontSize: 16, color: '#fff', marginLeft: 6 }]}>Add new</Text>
             </TouchableOpacity>
@@ -151,7 +201,7 @@ const Schedule = () => {
               style={styles.input}
               placeholder="Search schedules(yyyy/MM/dd)..."
               value={searchScheduleValue}
-              onChangeText={setSearchScheduleValue}
+              onChangeText={(text) => { setSearchScheduleValue(text) }}
             />
           </View>
 
@@ -170,8 +220,9 @@ const Schedule = () => {
           </View>
 
           {
-            debouncedSearchDoctorValue === '' && schedulesTodday.length > 0 && schedulesTodday.map(schedule => (
+            debouncedSearchScheduleValue === '' && schedulesTodday.length > 0 && schedulesTodday.map(schedule => (
               <ScheduleItem
+                scheduleId={schedule.id}
                 key={schedule.id}
                 schedule_time={schedule.schedule_time}
                 doctorIds={schedule.doctors}
@@ -181,10 +232,11 @@ const Schedule = () => {
           }
 
           {
-            debouncedSearchDoctorValue !== '' &&
+            debouncedSearchScheduleValue !== '' &&
             searchedSchedules.length > 0 &&
             searchedSchedules.map(schedule => schedule && (<ScheduleItem
               key={schedule.id}
+              scheduleId={schedule.id}
               schedule_time={schedule.schedule_time}
               doctorIds={schedule.doctors}
               nurseIds={schedule.nurses}
@@ -192,18 +244,6 @@ const Schedule = () => {
             />
             ))
           }
-
-          {/* <View style={[styles.input, { marginTop: 10, paddingLeft: 12 }]}>
-            <TouchableOpacity onPress={showDatePicker}>
-              <Text style={[{ fontSize: 16 }]}>{!selectedDate ? 'Select the time' : selectedDate && format(selectedDate, "dd/MM/yyyy HH:mm:ss")}</Text>
-            </TouchableOpacity>
-          </View>
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="datetime"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          /> */}
           {
             isLoading &&
             // <View>

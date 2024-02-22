@@ -1,13 +1,15 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TruncatedText from '../TruncatedText/TruncatedText';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import moment from 'moment'
 import Icons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { format } from 'date-fns';
+import { setScheduleIdActive, toggleIsOpenScheduleInfo } from '../../store/slice/appSlice';
 
-function ScheduleItem({ schedule_time, nurseIds, doctorIds, date }) {
+function ScheduleItem({ schedule_time, nurseIds, doctorIds, date, scheduleId }) {
+    const dispatch = useDispatch()
     const doctors = useSelector(state => state.doctors)
     const nurses = useSelector(state => state.nurses)
     const [scheduleDoctors, setScheduleDoctors] = useState([])
@@ -47,10 +49,13 @@ function ScheduleItem({ schedule_time, nurseIds, doctorIds, date }) {
             }]}>
                 <Text style={[{
                     fontSize: 18
-                }]}>Shift: {date ? `${format(schedule_time, "dd/MM/yyyy")} - ${moment.utc(schedule_time).format("HH:mm:ss")}` :
+                }]}>Shift: {date ? `${moment.utc(schedule_time).format("DD/MM/yyyy")} - ${moment.utc(schedule_time).format("HH:mm:ss")}` :
                     moment.utc(schedule_time).format("HH:mm:ss")}
                 </Text>
-                <TouchableOpacity onPress={() => { }}>
+                <TouchableOpacity onPress={() => { 
+                    dispatch(setScheduleIdActive(scheduleId))
+                    dispatch(toggleIsOpenScheduleInfo())
+                 }}>
                     <Icons style={[{ marginLeft: 20 }]} name='square-edit-outline' size={26} color={'#EBF400'} />
                 </TouchableOpacity>
             </View>

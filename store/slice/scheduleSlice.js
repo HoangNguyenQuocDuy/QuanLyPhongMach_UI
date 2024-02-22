@@ -24,18 +24,24 @@ export const fetchSchedulesData = createAsyncThunk(
 export const updateSchedules = createAsyncThunk(
     'schedules/updateSchedules',
     async (data) => {
-        const { access_token, scheduleId, updateData } = data
-
         try {
+
+            const { access_token, scheduleId, updateData } = data
+            console.log('access_token ', access_token)
+            console.log('scheduleId ', scheduleId)
+            console.log('updateData ', updateData)
+
             const response = await newRequest.patch(`/schedules/${scheduleId}/`, updateData, {
                 headers: {
-                    "Content-Type": 'multipart/form-data',
-                    'Authorization': `Bearer ${access_token}`
+                    "Authorization": `Bearer ${access_token}`,
+                    "Content-Type": 'application/json'
                 }
-            });
+            })
+            console.log('response.data: ', response.data)
             return response.data
-        } catch (err) {
-            console.log('Error from updateNurse: ', err)
+        }
+        catch (err) {
+            console.log('Error from updateSchedule: ', err)
         }
     }
 )
@@ -44,15 +50,15 @@ export const deleteSchedule = createAsyncThunk(
     'schedules/deleteNurse',
     async ({ access_token, scheduleId }) => {
         try {
-            const response = await newRequest.delete(`/schedules/${nurseId}/`, {
+            const response = await newRequest.delete(`/schedules/${scheduleId}/`, {
                 headers: {
                     'Authorization': `Bearer ${access_token}`
                 }
             })
-            console.log('response.data delete: ', response.data)
+            console.log('response.data delete: ', scheduleId)
             return scheduleId
         } catch (err) {
-            console.log('Error from deleteDoctor: ', err)
+            console.log('Error from deleteSchedule: ', err)
         }
     }
 )
@@ -64,7 +70,7 @@ export const createSchedule = createAsyncThunk(
         try {
             const response = await newRequest.post(`/schedules/`, data, {
                 headers: {
-                    "Content-Type": 'multipart/form-data',
+                    "Content-Type": 'application/json',
                     'Authorization': `Bearer ${access_token}`
                 }
             });
@@ -87,9 +93,15 @@ export const scheduleSlice = createSlice({
             const existingIds = state.results.map(schedule => schedule.id)
             const newSchedules = action.payload.results.filter(
                 schedule => !existingIds.includes(schedule.id)
-            );
+            )
+            console.log('addnewschedules: ', {
+                ...state,
+                count: state.count + newSchedules.length,
+                results: [...state.results, ...newSchedules]
+            })
             return {
                 ...state,
+                count: state.count + newSchedules.length,
                 results: [...state.results, ...newSchedules]
             }
         }

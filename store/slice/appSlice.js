@@ -9,7 +9,9 @@ const initialState = {
     isOpenAddUserBox: false,
     titleAddUserBox: 0,
     isOpenScheduleInfo: false,
-    scheduleIdActive: ''
+    scheduleIdActive: '',
+    isLoadSchedulesSearched: false,
+    isOpenAddScheduleBox: false
 }
 
 
@@ -62,13 +64,25 @@ export const appSlice = createSlice({
         toggleIsOpenScheduleInfo: (state, action) => {
             return{
                 ...state,
-                isOpenScheduleInfo: action.payload
+                isOpenScheduleInfo: !state.isOpenScheduleInfo
             }
         },
         setScheduleIdActive: (state, action) => {
             return { 
                 ...state, 
                 scheduleIdActive: action.payload
+            }
+        },
+        setIsLoadSchedulesSearched: (state, action) => {
+            return {
+                ...state,
+                isLoadSchedulesSearched: action.payload
+            }
+        },
+        toggleIsOpenAddScheduleBox: (state, action) => {
+            return {
+                ...state,
+                isOpenAddScheduleBox: !state.isOpenAddScheduleBox
             }
         }
     },
@@ -81,5 +95,6 @@ export default appSlice.reducer
 
 export const { toggleIsOpenUserInfoTag, setUsernameTagActive, setIsOpenAddUserBox,
     setOptionUserTagActive, setUserRoleIdTagActive, setShowConfirmation, 
-    setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive }
+    setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive,
+    setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox }
     = appSlice.actions
