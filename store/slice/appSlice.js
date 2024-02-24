@@ -16,6 +16,7 @@ const initialState = {
     isOpenUpdateMedicineBox: false,
     medicineIdActive: '',
     isOpenAddMedicineBox: false,
+    isAlreadyRegister: false
 }
 
 
@@ -112,6 +113,12 @@ export const appSlice = createSlice({
                 ...state, 
                 isOpenAddMedicineBox: !state.isOpenAddMedicineBox
             }
+        },
+        setIsAlreadyRegister: (state, action) => {
+            return {
+                ...state,
+                isAlreadyRegister: !state.isAlreadyRegister
+            }
         }
     },
     extraReducers: (builder) => {
@@ -125,5 +132,6 @@ export const { toggleIsOpenUserInfoTag, setUsernameTagActive, setIsOpenAddUserBo
     setOptionUserTagActive, setUserRoleIdTagActive, setShowConfirmation,
     setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive,
     setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox, toggleIsOpenUpdateMedicineBox,
-    setMedicineIdActive, setIsLoadMedicinesSearched, toggleIsOpenAddMedicineBox }
+    setMedicineIdActive, setIsLoadMedicinesSearched, toggleIsOpenAddMedicineBox,
+    setIsAlreadyRegister }
     = appSlice.actions

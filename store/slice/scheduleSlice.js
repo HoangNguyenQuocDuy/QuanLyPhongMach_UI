@@ -138,10 +138,10 @@ export const scheduleSlice = createSlice({
             builder.addCase(createSchedule.fulfilled, (state, action) => {
                 return {
                     ...state,
-                    result: {
-                        ...state.result,
+                    results: [
+                        ...state.results,
                         ...action.payload
-                    }
+                    ]
                 }
             })
     }

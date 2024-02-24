@@ -4,9 +4,13 @@ import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "reac
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLogin, login } from "../../store/slice/accountSlice";
 import { fetchUserData } from "../../store/slice/userSlice";
+import { setIsAlreadyRegister } from "../../store/slice/appSlice";
+import { setNewPasswordRegister, setNewUsernameRegister } from "../../store/slice/registerSlice";
 
 function Login({ navigation }) {
     const dispatch = useDispatch()
+    const { isAlreadyRegister } = useSelector(state => state.app)
+    const { newUsernameRegister, newPasswordRegister } = useSelector(state => state.register)
 
     const gotoRegister = () => {
         navigation.navigate('Register')
@@ -19,6 +23,9 @@ function Login({ navigation }) {
                 dispatch(fetchUserData(username))
                 .then(data => {
                     console.log('Data user login: ', data.payload)
+                    dispatch(setIsAlreadyRegister(false))
+                    dispatch(setNewUsernameRegister(''))
+                    dispatch(setNewPasswordRegister(''))
                 })
                 .catch(err => {
                     console.log('Error when get user login data: ', err)
@@ -62,7 +69,10 @@ function Login({ navigation }) {
             />
 
             <Formik
-                initialValues={{ username: '', password: '' }}
+                initialValues={{ 
+                    username: isAlreadyRegister ? newUsernameRegister : '', 
+                    password: isAlreadyRegister ? newPasswordRegister : '' 
+                }}
                 onSubmit={(values, { resetForm }) => {
                     handleLogin(values)
                     resetForm()
