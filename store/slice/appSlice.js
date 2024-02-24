@@ -11,7 +11,11 @@ const initialState = {
     isOpenScheduleInfo: false,
     scheduleIdActive: '',
     isLoadSchedulesSearched: false,
-    isOpenAddScheduleBox: false
+    isLoadMedicinesSearched: false,
+    isOpenAddScheduleBox: false,
+    isOpenUpdateMedicineBox: false,
+    medicineIdActive: '',
+    isOpenAddMedicineBox: false,
 }
 
 
@@ -62,14 +66,14 @@ export const appSlice = createSlice({
             }
         },
         toggleIsOpenScheduleInfo: (state, action) => {
-            return{
+            return {
                 ...state,
                 isOpenScheduleInfo: !state.isOpenScheduleInfo
             }
         },
         setScheduleIdActive: (state, action) => {
-            return { 
-                ...state, 
+            return {
+                ...state,
                 scheduleIdActive: action.payload
             }
         },
@@ -84,6 +88,30 @@ export const appSlice = createSlice({
                 ...state,
                 isOpenAddScheduleBox: !state.isOpenAddScheduleBox
             }
+        },
+        toggleIsOpenUpdateMedicineBox: (state, action) => {
+            return {
+                ...state,
+                isOpenUpdateMedicineBox: !state.isOpenUpdateMedicineBox
+            }
+        }, 
+        setMedicineIdActive: (state, action) => {
+            return {
+                ...state,
+                medicineIdActive: action.payload
+            }
+        },
+        setIsLoadMedicinesSearched: (state, action) => {
+            return {
+                ...state,
+                isLoadMedicinesSearched: action.payload
+            }
+        },
+        toggleIsOpenAddMedicineBox: (state, action) => {
+            return {
+                ...state, 
+                isOpenAddMedicineBox: !state.isOpenAddMedicineBox
+            }
         }
     },
     extraReducers: (builder) => {
@@ -94,7 +122,8 @@ export const appSlice = createSlice({
 export default appSlice.reducer
 
 export const { toggleIsOpenUserInfoTag, setUsernameTagActive, setIsOpenAddUserBox,
-    setOptionUserTagActive, setUserRoleIdTagActive, setShowConfirmation, 
+    setOptionUserTagActive, setUserRoleIdTagActive, setShowConfirmation,
     setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive,
-    setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox }
+    setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox, toggleIsOpenUpdateMedicineBox,
+    setMedicineIdActive, setIsLoadMedicinesSearched, toggleIsOpenAddMedicineBox }
     = appSlice.actions

@@ -27,25 +27,25 @@ function Staff() {
     const [nursesSearch, setNursesSearch] = useState([])
 
     useEffect(() => {
-        if (fetchedDoctor) {
-            dispatch(fetchDoctorsData({ access_token }))
-                .then(data => {
-                    setFetchedDoctor(false)
-                })
-                .catch(err => {
-                    console.log('Error when trying get doctor: ', err)
-                })
-        }
-        if (fetchedNurse) {
-            dispatch(fetchNursesData({ access_token }))
-                .then(data => {
-                    setFetchedNurse(false)
-                })
-                .catch(err => {
-                    console.log('Error when trying get doctor: ', err)
-                })
+        // if (fetchedDoctor) {
+        //     dispatch(fetchDoctorsData({ access_token }))
+        //         .then(data => {
+        //             setFetchedDoctor(false)
+        //         })
+        //         .catch(err => {
+        //             console.log('Error when trying get doctor: ', err)
+        //         })
+        // }
+        // if (fetchedNurse) {
+        //     dispatch(fetchNursesData({ access_token }))
+        //         .then(data => {
+        //             setFetchedNurse(false)
+        //         })
+        //         .catch(err => {
+        //             console.log('Error when trying get doctor: ', err)
+        //         })
 
-        }
+        // }
 
         if (searchDoctorValue !== '') {
             const handleSearchDoctor = async () => {
@@ -62,6 +62,8 @@ function Staff() {
                     })
             }
             handleSearchDoctor()
+        } else {
+            setDoctorsSearch([])
         }
 
         if (searchNurseValue !== '') {
@@ -79,80 +81,73 @@ function Staff() {
                     })
             }
             handleSearchNurse()
+        } else {
+            setNursesSearch([])
         }
     }, [debouncedSearchDoctorValue, debouncedSearchNurseValue, isOpenUserInfoTag, isOpenAddUserBox]);
 
     const doctors = useSelector(state => state.doctors)
     const nurses = useSelector(state => state.nurses)
-    // const loadMoreDoctors = () => {
-    //     if (!isLoadingMore) {
-    //         setIsLoadingMore(true)
-
-    //         const maxPages = doctors.count % 2 === 0 ? doctors.count / 2 : doctors.count / 2 + 1
-
-    //         if (page < maxPages) {
-    //             setPage(page + 1)
-    //         }
-    //     }
-    // };
-
-    const renderItem = ({ item }) => {
-        return (
-            <UserTag
-                first_name={item.user.first_name}
-                last_name={item.user.last_name}
-                avatar={item.user.avatar}
-                speciality={item.speciality}
-                username={item.user.username}
-                id={item.id}
-            />
-        );
-    }
-
-    // console.log(doctors)
 
     return (
-        <>
+        <View style={[{
+            display: 'flex', justifyContent: 'center', alignItems: 'center',
+            width: '100%', height: '100%', backgroundColor: '#fff', flexDirection: 'row'
+        }]}>
             <View style={[{
-                display: 'flex', justifyContent: 'center',
-                alignContent: 'center', width: '100%', flexDirection: 'row'
+                backgroundColor: '#fff', height: '100%', width: '90%',
+                display: 'flex', justifyContent: 'space-between', paddingVertical: 20
             }]}>
                 <View style={[{
-                    width: '86%', padding: 10, borderRadius: 10, marginTop: 20,
+                    display: 'flex', justifyContent: 'center',
+                    alignContent: 'flex-start', width: '100%', flexDirection: 'row', height: '48%',
                     backgroundColor: '#fff',
+                    borderRadius: 10,
+                    shadowColor: '#171717',
+                    shadowOffset: { width: -2, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    elevation: 5,
                 }]}>
-                    <Text style={[{
-                        fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center'
-                    }]}>
-                        Doctors
-                    </Text>
+                    <View style={styles.container}>
+                        <View style={[{
+                            display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                            width: '100%', alignItems: 'center', marginTop: 8, height: 60
+                        }]}>
+                            <Text style={[styles.title, { marginTop: 10 }]}>DOCTORS</Text>
+                            <TouchableOpacity style={[{
+                                backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+                                display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                                borderRadius: 8
+                            }]}
+                                onPress={() => {
+                                    dispatch(setTitleAddUserBox(0))
+                                    dispatch(setIsOpenAddUserBox(true))
+                                }}
+                            >
+                                <Icons name='plus' size={20} color={'white'} />
+                                <Text style={[{ fontSize: 16, color: '#fff', marginLeft: 6 }]}>Add new</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                    <View style={[{ display: 'flex', justifyContent: 'center', flexDirection: 'row' }]}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Search doctors..."
-                            value={searchDoctorValue}
-                            onChangeText={setSearchDoctorValue}
-                        />
-                    </View>
+                        <View style={[{
+                            display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                        }]}>
+                            <View style={[{ display: 'flex', justifyContent: 'center', flexDirection: 'row' }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Search doctors..."
+                                    value={searchDoctorValue}
+                                    onChangeText={setSearchDoctorValue}
+                                />
+                            </View>
+                        </View>
 
-                    <ScrollView style={[{ maxHeight: 140 }]}>
-                        <View style={{ overflow: 'scroll' }}>
-                            {debouncedSearchDoctorValue !== '' && doctorsSearch.length > 0 ?
-                                doctorsSearch && doctorsSearch.map(doctor => (
-                                    <UserTag
-                                        key={doctor.id}
-                                        first_name={doctor.user.first_name}
-                                        last_name={doctor.user.last_name}
-                                        avatar={doctor.user.avatar}
-                                        speciality={doctor.speciality}
-                                        username={doctor.user.username}
-                                        id={doctor.id}
-                                    />
-                                ))
-                                : doctors.length > 0 && doctors && doctors.map(doctor => {
-                                    if (doctor) {
-                                        return <UserTag
+                        <ScrollView style={[{ maxHeight: 200 }]}>
+                            <View style={{ overflow: 'scroll' }}>
+                                {debouncedSearchDoctorValue !== '' && doctorsSearch.length > 0 ?
+                                    doctorsSearch && doctorsSearch.map(doctor => (
+                                        <UserTag
                                             key={doctor.id}
                                             first_name={doctor.user.first_name}
                                             last_name={doctor.user.last_name}
@@ -161,77 +156,74 @@ function Staff() {
                                             username={doctor.user.username}
                                             id={doctor.id}
                                         />
-                                    }
-                                })}
-                        </View>
-                    </ScrollView>
-
-                    <View style={[{
-                        display: 'flex', alignItems: 'center', marginBottom: 10,
-                        paddingTop: 16,
-                        justifyContent: 'center'
-                    }]}>
-                        <TouchableOpacity
-                            style={[{
-                                backgroundColor: '#6895D2', borderRadius: 100,
-                                paddingHorizontal: 16, paddingVertical: 10,
-                                display: 'flex', justifyContent: 'center', flexDirection: 'row'
-                            }]}
-                            onPress={() => { 
-                                dispatch(setTitleAddUserBox(0))
-                                dispatch(setIsOpenAddUserBox(true)) 
-                                }}>
-                            <Icons name="plus" size={20} color={'white'} />
-
-                            <Text style={[{ fontSize: 16, color: '#fff', paddingLeft: 4 }]}>
-                                Add new Doctor
-                            </Text>
-                        </TouchableOpacity>
+                                    ))
+                                    : doctors.length > 0 && doctors && doctors.map(doctor => {
+                                        if (doctor) {
+                                            return <UserTag
+                                                key={doctor.id}
+                                                first_name={doctor.user.first_name}
+                                                last_name={doctor.user.last_name}
+                                                avatar={doctor.user.avatar}
+                                                speciality={doctor.speciality}
+                                                username={doctor.user.username}
+                                                id={doctor.id}
+                                            />
+                                        }
+                                    })}
+                            </View>
+                        </ScrollView>
                     </View>
                 </View>
-            </View>
-
-            {/* NURSE */}
-            <View style={[{
-                display: 'flex', justifyContent: 'center',
-                alignContent: 'center', width: '100%', flexDirection: 'row'
-            }]}>
                 <View style={[{
-                    width: '86%', padding: 10, borderRadius: 10, marginTop: 20,
+                    display: 'flex', justifyContent: 'center',
+                    alignContent: 'flex-start', width: '100%', flexDirection: 'row', height: '48%',
                     backgroundColor: '#fff',
+                    borderRadius: 10,
+                    shadowColor: '#171717',
+                    shadowOffset: { width: -2, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    elevation: 5,
                 }]}>
-                    <Text style={[{
-                        fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center'
-                    }]}>
-                        Nurses
-                    </Text>
+                    <View style={styles.container}>
+                        <View style={[{
+                            display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                            width: '100%', alignItems: 'center', height: 80
+                        }]}>
+                            <Text style={[styles.title, { marginTop: 10 }]}>NURSES</Text>
+                            <TouchableOpacity style={[{
+                                backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+                                display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                                borderRadius: 8
+                            }]}
+                                onPress={() => {
+                                    dispatch(setTitleAddUserBox(1))
+                                    dispatch(setIsOpenAddUserBox(true))
+                                }}
+                            >
+                                <Icons name='plus' size={20} color={'white'} />
+                                <Text style={[{ fontSize: 16, color: '#fff', marginLeft: 6 }]}>Add new</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                    <View style={[{ display: 'flex', justifyContent: 'center', flexDirection: 'row' }]}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Search nurses..."
-                            value={searchNurseValue}
-                            onChangeText={setSearchNurseValue}
-                        />
-                    </View>
+                        <View style={[{
+                            display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                        }]}>
+                            <View style={[{ display: 'flex', justifyContent: 'center', flexDirection: 'row' }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Search doctors..."
+                                    value={searchNurseValue}
+                                    onChangeText={setSearchNurseValue}
+                                />
+                            </View>
+                        </View>
 
-                    <ScrollView style={[{ maxHeight: 140 }]}>
-                        <View style={{ overflow: 'scroll' }}>
-                            {debouncedSearchNurseValue !== '' && nursesSearch.length > 0 ?
-                                nursesSearch && nursesSearch.map(nurse => (
-                                    <UserTag
-                                        key={nurse.id}
-                                        first_name={nurse.user.first_name}
-                                        last_name={nurse.user.last_name}
-                                        avatar={nurse.user.avatar}
-                                        faculty={nurse.faculty}
-                                        username={nurse.user.username}
-                                        id={nurse.id}
-                                    />
-                                ))
-                                : nurses.length > 0 && nurses && nurses.map(nurse => {
-                                    if (nurse) {
-                                        return <UserTag
+                        <ScrollView style={[{ maxHeight: 190 }]}>
+                            <View style={{ overflow: 'scroll' }}>
+                                {debouncedSearchNurseValue !== '' && nursesSearch.length > 0 ?
+                                    nursesSearch && nursesSearch.map(nurse => (
+                                        <UserTag
                                             key={nurse.id}
                                             first_name={nurse.user.first_name}
                                             last_name={nurse.user.last_name}
@@ -240,49 +232,48 @@ function Staff() {
                                             username={nurse.user.username}
                                             id={nurse.id}
                                         />
-                                    }
-                                })}
-                        </View>
-                    </ScrollView>
-
-                    <View style={[{
-                        display: 'flex', alignItems: 'center', marginBottom: 10,
-                        paddingTop: 16,
-                        justifyContent: 'center'
-                    }]}>
-                        <TouchableOpacity
-                            style={[{
-                                backgroundColor: '#6895D2', borderRadius: 100,
-                                paddingHorizontal: 16, paddingVertical: 10,
-                                display: 'flex', justifyContent: 'center', flexDirection: 'row'
-                            }]}
-                            onPress={() => { 
-                                dispatch(setTitleAddUserBox(1))
-                                dispatch(setIsOpenAddUserBox(true)) 
-                                }}>
-                            <Icons name="plus" size={20} color={'white'} />
-
-                            <Text style={[{ fontSize: 16, color: '#fff', paddingLeft: 4 }]}>
-                                Add new Nurse
-                            </Text>
-                        </TouchableOpacity>
+                                    ))
+                                    : nurses.length > 0 && nurses && nurses.map(nurse => {
+                                        if (nurse) {
+                                            return <UserTag
+                                                key={nurse.id}
+                                                first_name={nurse.user.first_name}
+                                                last_name={nurse.user.last_name}
+                                                avatar={nurse.user.avatar}
+                                                faculty={nurse.faculty}
+                                                username={nurse.user.username}
+                                                id={nurse.id}
+                                            />
+                                        }
+                                    })}
+                            </View>
+                        </ScrollView>
                     </View>
                 </View>
             </View>
-        </>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        width: '86%'
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    selectedDate: {
+        marginTop: 20,
+        fontSize: 18,
+    },
     input: {
         fontSize: 16,
-        paddingTop: 10,
-        paddingBottom: 10,
         paddingLeft: 16,
         height: 42,
         borderRadius: 100,
-        paddingHorizontal: 10,
-        width: '90%',
+        width: '100%',
         marginBottom: 20,
         backgroundColor: '#f4f7f9',
         fontSize: 16

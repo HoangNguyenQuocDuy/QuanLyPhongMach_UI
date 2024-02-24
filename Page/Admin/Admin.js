@@ -9,9 +9,7 @@ function ManageStaff() {
     return (
         <>
             <View>
-                <View style={[{ marginTop: 12 }]}>
                     <Staff />
-                </View>
             </View>
         </>
 

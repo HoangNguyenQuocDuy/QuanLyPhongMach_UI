@@ -1,14 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { Formik } from 'formik';
 import { Picker } from '@react-native-picker/picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { format } from "date-fns";
 import { setIsOpenAddUserBox, setTitleAddUserBox } from "../../store/slice/appSlice";
 import AvatarPicker from "../AvatarPicker/AvatarPicker";
-import { createDoctor } from "../../store/slice/doctorsSlice";
+import { createDoctor, getDoctorById } from "../../store/slice/doctorsSlice";
 import newRequest from "../../ultils/request";
+import Icons from 'react-native-vector-icons/FontAwesome'
+import { createNurse } from "../../store/slice/nurseSlice";
+// import moment from 'moment'
 
 function AddUserBox() {
     const genders = ['male', 'female']
@@ -33,29 +36,38 @@ function AddUserBox() {
         username, email, password, first_name, last_name, gender,
         speciality, address
     }) => {
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('email', email);
-        formData.append('password', password);
-        formData.append('first_name', first_name);
-        formData.append('last_name', last_name);
-        formData.append('gender', gender);
-        formData.append('speciality', speciality);
-        formData.append('address', address);
-        formData.append('birth', birth);
-
-        await newRequest.post('/doctors/', formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    "Content-Type": 'multipart/form-data',
-                }
+        const formData = new FormData
+        formData.append('username', username.trim())
+        formData.append('email', email.trim())
+        formData.append('password', password.trim())
+        formData.append('first_name', first_name.trim())
+        formData.append('last_name', last_name.trim())
+        formData.append('gender', gender.trim())
+        formData.append('speciality', speciality.trim())
+        formData.append('address', address.trim());
+        formData.append('birth', format(birth, 'yyyy-MM-dd'))
+        if (avatar) {
+            formData.append('avatar', {
+                uri: avatar,
+                name: 'image.jpg',
+                type: 'image/jpg',
             })
+        }
+
+        dispatch(createDoctor({ access_token, data: formData }))
             .then(data => {
-                console.log('data.payload create doctor: ', data.payload)
+                console.log('data create doctor: ', data.payload)
+                // dispatch(getDoctorById({ access_token, doctorId: data.payload.id }))
+                //     .then(data => {
+                //         console.log('data get doctor: ', data.payload)
+                dispatch(setIsOpenAddUserBox(false))
+                // })
+                // .catch(err => {
+                //     console.log('Error when get doctor by id: ', err)
+                // })
             })
             .catch(err => {
-                console.log("Error when create doctor: ", err)
+                console.log('err when creat doctor: ', err)
             })
     }
 
@@ -63,30 +75,31 @@ function AddUserBox() {
         username, email, password, first_name, last_name, gender,
         faculty, address
     }) => {
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('email', email);
-        formData.append('password', password);
-        formData.append('first_name', first_name);
-        formData.append('last_name', last_name);
-        formData.append('gender', gender);
-        formData.append('faculty', faculty);
-        formData.append('address', address);
-        formData.append('birth', birth);
-
-        await newRequest.post('/nurses/', formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    "Content-Type": 'multipart/form-data',
-                }
+        const formData = new FormData;
+        formData.append('username', username.trim());
+        formData.append('email', email.trim());
+        formData.append('password', password.trim());
+        formData.append('first_name', first_name.trim());
+        formData.append('last_name', last_name.trim());
+        formData.append('gender', gender.trim());
+        formData.append('faculty', faculty.trim());
+        formData.append('address', address.trim());
+        formData.append('birth', format(birth, 'yyyy-MM-dd'))
+        if (avatar) {
+            formData.append('avatar', {
+                uri: avatar,
+                name: 'image.jpg',
+                type: 'image/jpg',
             })
-            .then(data => {
-                console.log('data.payload create doctor: ', data.payload)
-            })
-            .catch(err => {
-                console.log("Error when create doctor: ", err)
-            })
+        }
+        dispatch(createNurse({ access_token, data: formData }))
+        .then(data => {
+            console.log('data create nurse: ', data.payload)
+            dispatch(setIsOpenAddUserBox(false))
+        })
+        .catch(err => {
+            console.log('err when creat nurse: ', err)
+        })
     }
     return (
         <View style={styles.wrapper}>
@@ -99,12 +112,12 @@ function AddUserBox() {
                     last_name: '',
                     gender: genders[0],
                     speciality: '',
-                    falcuty: '',
+                    faculty: '',
                     address: '',
                     birth: '',
                 }}
                 onSubmit={(values, actions) => {
-                    console.log(values)
+                    // console.log(values)
                     if (titleAddUserBox === 0) {
                         handleCreateDoctor(values)
                     } else {
@@ -124,160 +137,254 @@ function AddUserBox() {
                     handleSubmit,
                 }) => (
                     <View style={styles.container}>
-                        <Text style={styles.title}>{titleAddUserBox === 0 ?
-                            'CREATE A DOCTOR' : 'CREATE A NURSE'}
-                        </Text>
-                        <TextInput
-                            style={styles.input}
-                            name="first_name"
-                            value={values.first_name}
-                            onChangeText={handleChange('first_name')}
-                            onBlur={handleBlur('first_name')}
-                            placeholder="First name"
-                        />
-                        {touched.first_name && errors.first_name && (
-                            <Text style={{ color: 'red' }}>{errors.first_name}</Text>
-                        )}
-
-                        <TextInput
-                            style={styles.input}
-
-                            name="last_name"
-                            value={values.last_name}
-                            onChangeText={handleChange('last_name')}
-                            onBlur={handleBlur('last_name')}
-                            placeholder="Last name"
-                        />
-                        {touched.last_name && errors.last_name && (
-                            <Text style={{ color: 'red' }}>{errors.last_name}</Text>
-                        )}
-                        <TextInput
-                            style={styles.input}
-                            name="username"
-                            value={values.username}
-                            onChangeText={handleChange('username')}
-                            onBlur={handleBlur('username')}
-                            placeholder="Username"
-                        />
-                        {touched.username && errors.username && (
-                            <Text style={{ color: 'red' }}>{errors.username}</Text>
-                        )}
-
-                        <TextInput
-                            style={styles.input}
-                            name="email"
-                            value={values.email}
-                            onChangeText={handleChange('email')}
-                            onBlur={handleBlur('email')}
-                            placeholder="Email"
-                        />
-                        {touched.email && errors.email && (
-                            <Text style={{ color: 'red' }}>{errors.email}</Text>
-                        )}
-
-                        <TextInput
-                            style={styles.input}
-                            name="password"
-                            value={values.password}
-                            onChangeText={handleChange('password')}
-                            onBlur={handleBlur('password')}
-                            placeholder="Password"
-                            secureTextEntry
-                        />
-                        {touched.password && errors.password && (
-                            <Text style={{ color: 'red' }}>{errors.password}</Text>
-                        )}
-
-
-                        {
-                            titleAddUserBox === 0 &&
-                            <TextInput
-                                style={styles.input}
-                                name="speciality"
-                                value={values.speciality}
-                                onChangeText={handleChange('speciality')}
-                                onBlur={handleBlur('speciality')}
-                                placeholder="Speciality"
-                            />
-                            // {
-                            //     touched.speciality && errors.speciality && (
-                            //     <Text style={{ color: 'red' }}>{errors.speciality}</Text>
-                            // )}
-                        }
-
-                        {
-                            titleAddUserBox === 1 &&
-                            <TextInput
-                                style={styles.input}
-                                name="falcuty"
-                                value={values.falcuty}
-                                onChangeText={handleChange('falcuty')}
-                                onBlur={handleBlur('falcuty')}
-                                placeholder="Falcuty"
-                            />
-                            // {
-                            //     touched.falcuty && errors.falcuty && (
-                            //     <Text style={{ color: 'red' }}>{errors.falcuty}</Text>
-                            // )}
-                        }
-                        <TextInput
-                            style={styles.input}
-                            name="address"
-                            value={values.address}
-                            onChangeText={handleChange('address')}
-                            onBlur={handleBlur('address')}
-                            placeholder="Address"
-                        />
-                        {touched.address && errors.address && (
-                            <Text style={{ color: 'red' }}>{errors.address}</Text>
-                        )}
-
-                        <View style={styles.picker}>
-                            <Picker
-                                style={[styles.input, { width: '100%' }]}
-                                selectedValue={values.gender}
-                                onValueChange={(itemValue) => handleChange('gender')(itemValue)}>
-                                {genders.map((gender) => (
-                                    <Picker.Item key={gender} label={gender} value={gender} />
-                                ))}
-                            </Picker>
-                        </View>
-
-                        <View style={[styles.input, { marginTop: 10, paddingLeft: 12 }]}>
-                            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                                <Text style={[{ fontSize: 16 }]}>{!birth ? 'Select your birthday' : birth && format(birth, 'yyyy-MM-dd')}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        {showDatePicker && (
-                            <DateTimePicker
-                                value={birth || new Date()}
-                                mode="date"
-                                display="default"
-                                onChange={handleDateChange}
-                            />
-                        )}
-
                         <View style={[{
-                            display: 'flex', flexDirection: 'row',
+                            display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                            width: '100%', alignItems: 'center', marginTop: 16, height: 60, marginBottom: 16
                         }]}>
-                            <Text style={[{ fontSize: 16 }]}>Avatar</Text>
-                            <View style={[{ marginLeft: 120 }]}>
-                                <AvatarPicker onAvatarSelected={handleAvatarSelected} />
-                            </View>
-                        </View>
-
-                        <View style={[{
-                            display: 'flex', justifyContent: 'space-between',
-                            flexDirection: 'row'
-                        }]}>
-                            <TouchableOpacity style={[styles.button, { backgroundColor: '#6895D2' }]} onPress={handleSubmit}>
-                                <Text style={styles.buttonText}>Add</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.button, { marginLeft: 40 }]}
+                            <Text style={[styles.title, { marginTop: 10 }]}>{titleAddUserBox === 0 ?
+                                'DOCTOR' : 'NURSE'}</Text>
+                            <TouchableOpacity style={[{
+                                backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+                                display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                                borderRadius: 8
+                            }]}
                                 onPress={() => {
                                     dispatch(setIsOpenAddUserBox(false))
-                                }}>
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                }}
+                            >
+                                <Icons name='close' size={26} color={'white'} />
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView style={[{ maxHeight: '80%' }]}>
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>First name</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    name="first_name"
+                                    value={values.first_name}
+                                    onChangeText={handleChange('first_name')}
+                                    onBlur={handleBlur('first_name')}
+                                    placeholder="First name"
+                                />
+                                {touched.first_name && errors.first_name && (
+                                    <Text style={{ color: 'red' }}>{errors.first_name}</Text>
+                                )}
+                            </View>
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Last name</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+
+                                    name="last_name"
+                                    value={values.last_name}
+                                    onChangeText={handleChange('last_name')}
+                                    onBlur={handleBlur('last_name')}
+                                    placeholder="Last name"
+                                />
+                                {touched.last_name && errors.last_name && (
+                                    <Text style={{ color: 'red' }}>{errors.last_name}</Text>
+                                )}
+                            </View>
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Username</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    name="username"
+                                    value={values.username}
+                                    onChangeText={handleChange('username')}
+                                    onBlur={handleBlur('username')}
+                                    placeholder="Username"
+                                />
+                                {touched.username && errors.username && (
+                                    <Text style={{ color: 'red' }}>{errors.username}</Text>
+                                )}
+                            </View>
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Email</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    name="email"
+                                    value={values.email}
+                                    onChangeText={handleChange('email')}
+                                    onBlur={handleBlur('email')}
+                                    placeholder="Email"
+                                />
+                                {touched.email && errors.email && (
+                                    <Text style={{ color: 'red' }}>{errors.email}</Text>
+                                )}
+                            </View>
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Password</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    name="password"
+                                    value={values.password}
+                                    onChangeText={handleChange('password')}
+                                    onBlur={handleBlur('password')}
+                                    placeholder="Password"
+                                    secureTextEntry
+                                />
+                                {touched.password && errors.password && (
+                                    <Text style={{ color: 'red' }}>{errors.password}</Text>
+                                )}
+                            </View>
+
+
+                            {
+                                titleAddUserBox === 0 &&
+                                <View>
+                                    <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Speciality</Text>
+                                    <View style={[{
+                                        display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                        marginTop: 4
+                                    }]}>
+                                        <TextInput
+                                            style={styles.input}
+                                            name="speciality"
+                                            value={values.speciality}
+                                            onChangeText={handleChange('speciality')}
+                                            onBlur={handleBlur('speciality')}
+                                            placeholder="Speciality"
+                                        />
+                                    </View>
+                                </View>
+                                // {
+                                //     touched.speciality && errors.speciality && (
+                                //     <Text style={{ color: 'red' }}>{errors.speciality}</Text>
+                                // )}
+                            }
+
+                            {
+                                titleAddUserBox === 1 &&
+                                <View>
+                                    <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Faculty</Text>
+                                    <View style={[{
+                                        display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                        marginTop: 4
+                                    }]}>
+                                        <TextInput
+                                            style={styles.input}
+                                            name="faculty"
+                                            value={values.faculty}
+                                            onChangeText={handleChange('faculty')}
+                                            onBlur={handleBlur('faculty')}
+                                            placeholder="Falcuty"
+                                        />
+                                    </View>
+                                </View>
+                                // {
+                                //     touched.faculty && errors.faculty && (
+                                //     <Text style={{ color: 'red' }}>{errors.faculty}</Text>
+                                // )}
+                            }
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Address</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <TextInput
+                                    style={styles.input}
+                                    name="address"
+                                    value={values.address}
+                                    onChangeText={handleChange('address')}
+                                    onBlur={handleBlur('address')}
+                                    placeholder="Address"
+                                />
+                                {touched.address && errors.address && (
+                                    <Text style={{ color: 'red' }}>{errors.address}</Text>
+                                )}
+                            </View>
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Gender</Text>
+                            <View style={[{
+                                marginTop: 4
+                            }]}>
+                                <View style={styles.picker}>
+                                    <View
+                                        style={[{
+                                            fontSize: 16,
+                                            // paddingTop: 10,
+                                            // paddingBottom: 10,
+                                            // paddingLeft: 16,
+                                            // height: 42,
+                                            borderRadius: 100,
+                                            // paddingHorizontal: 10,
+                                            width: '96%',
+                                            marginBottom: 20,
+                                            backgroundColor: '#f4f7f9',
+                                        }]}
+                                    >
+                                        <Picker
+                                            selectedValue={values.gender}
+                                            onValueChange={(itemValue) => handleChange('gender')(itemValue)}>
+                                            {genders.map((gender) => (
+                                                <Picker.Item key={gender} label={gender} value={gender} />
+                                            ))}
+                                        </Picker>
+                                    </View>
+                                </View>
+                            </View>
+
+
+                            <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Birth</Text>
+                            <View style={[{
+                                display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                marginTop: 4
+                            }]}>
+                                <View style={[styles.input, { paddingLeft: 12 }]}>
+                                    <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                                        <Text style={[{ fontSize: 16 }]}>{!birth ? 'Select your birthday' : birth && format(birth, 'yyyy-MM-dd')}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={birth || new Date()}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleDateChange}
+                                    />
+                                )}
+                            </View>
+
+                            <View style={[{
+                                display: 'flex', flexDirection: 'row', paddingBottom: 20
+                            }]}>
+                                <Text style={[{ fontSize: 20, fontWeight: 'bold' }]}>Avatar</Text>
+                                <View style={[{
+                                    display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                                    marginTop: 4
+                                }]}></View>
+                                <View style={[{ marginLeft: 120 }]}>
+                                    <AvatarPicker onAvatarSelected={handleAvatarSelected} />
+                                </View>
+                            </View>
+                        </ScrollView>
+
+                        <View style={[{
+                            display: 'flex', justifyContent: 'space-around', alignItems: 'center',
+                            flexDirection: 'row', width: '100%', marginBottom: 20,
+                        }]}>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: '#6895D2', width: 160 }]} onPress={handleSubmit}>
+                                <Text style={styles.buttonText}>Create medicine</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -297,26 +404,31 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent'
     },
     container: {
-        flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
+        width: '86%',
+        marginTop: 60
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 20,
+    },
+    selectedDate: {
+        marginTop: 20,
+        fontSize: 18,
     },
     input: {
         fontSize: 16,
         paddingTop: 10,
         paddingBottom: 10,
+        paddingLeft: 16,
         height: 42,
-        borderRadius: 8,
+        borderRadius: 100,
         paddingHorizontal: 10,
-        width: '80%',
+        width: '96%',
         marginBottom: 20,
-        backgroundColor: '#f4f7f9'
+        backgroundColor: '#f4f7f9',
     },
     button: {
         width: '30%',
@@ -331,25 +443,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 16
-    },
-    picker: {
-        borderRadius: 9,
-        width: '80%',
-        overflow: 'hidden',
-    },
-    register: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10
-    },
-    registerTitle: {
-        fontSize: 14
-    },
-    registerText: {
-        fontSize: 16,
-        paddingLeft: 4,
-        color: '#fa6a67'
     },
 })
 

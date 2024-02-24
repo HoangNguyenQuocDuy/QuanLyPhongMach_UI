@@ -9,13 +9,14 @@ function AvatarPicker({ onAvatarSelected }) {
 
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
+            aspect: [4, 3],
             quality: 1,
         });
 
         if (!result.canceled) {
             setSelectedImage(result.assets[0].uri);
-            console.log(result.assets[0].uri)
             onAvatarSelected(result.assets[0].uri)
         } else {
             alert('You did not select any image.');

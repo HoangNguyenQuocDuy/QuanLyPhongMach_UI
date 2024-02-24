@@ -20,6 +20,25 @@ export const fetchDoctorsData = createAsyncThunk(
     }
 )
 
+export const getDoctorById = createAsyncThunk(
+    'doctors/getDoctorById',
+    async ({ access_token, doctorId }) => {
+        console.log('doctorId ',doctorId)
+        try {
+            const response = await newRequest.get(`/doctors/${doctorId}/`, {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`
+                }
+            })
+            console.log('response get: ', response.data)
+            return response.data
+        }
+        catch (err) {
+            console.log('Error from getDoctorById: ', err)
+        }
+    }
+)
+
 export const updateDoctors = createAsyncThunk(
     'doctors/updateDoctors',
     async (data) => {
@@ -69,10 +88,10 @@ export const createDoctor = createAsyncThunk(
                     'Authorization': `Bearer ${access_token}`
                 }
             });
-            console.log('response from createDoctor: ', response.data)
-            return response.data
+            console.log('response from createDoctor: ', response.data.data)
+            return response.data.data
         } catch (err) {
-            console.log('Error from createDoctor: ', err)
+            console.log('Error from createDoctor1: ', err)
         }
     }
 )
@@ -84,6 +103,12 @@ export const doctorsSlice = createSlice({
         clearDoctors: () => {
             return initialState
         },
+        addNewDoctors: (state, action) => {
+            const exitingIds = state.map(doctor => doctor.id) 
+            const newDoctors = action.payload.filter(doctor => !exitingIds.includes(doctor.id))
+            
+            return [...state, ...newDoctors]
+        }
         // deleteDoctor: (state, action) => {
         //     const newDoctors = state.results.filter(doctor => doctor.id !== action.payload)
         //     return {
@@ -121,11 +146,15 @@ export const doctorsSlice = createSlice({
                 return [...updatedResults]
             }),
             builder.addCase(deleteDoctor.fulfilled, (state, action) => {
-                const newDoctors = state.results.filter(doctor => doctor.id !== action.payload)
+                const newDoctors = state.filter(doctor => doctor.id !== action.payload)
                 return [...newDoctors]
 
             }),
             builder.addCase(createDoctor.fulfilled, (state, action) => {
+                return [...state]
+            }),
+            builder.addCase(getDoctorById.fulfilled, (state, action) => {
+                console.log('action.payload get: ', action.payload)
                 return [
                     ...state,
                     action.payload
@@ -135,7 +164,7 @@ export const doctorsSlice = createSlice({
 })
 
 export const {
-    clearDoctors
+    clearDoctors, addNewDoctors
 } = doctorsSlice.actions
 
 export default doctorsSlice.reducer

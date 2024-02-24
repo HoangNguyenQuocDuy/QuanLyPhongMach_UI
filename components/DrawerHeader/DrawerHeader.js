@@ -1,18 +1,25 @@
 import { DrawerItemList } from '@react-navigation/drawer';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, SafeAreaView } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData } from '../../store/slice/userSlice';
 
 const DrawerHeader = ({ props }) => {
+    const dispatch = useDispatch()
+
+    const user = useSelector(state => state.user)
+
     return (
         <SafeAreaView>
             <View style={styles.container}>
                 <View style={[{ marginTop: 50 }]}>
                     <Image
-                        source={require('../../assets/images/nonAvatar.jpg')}
+                        source={user.avatar ? { uri: user.avatar } :
+                            require('../../assets/images/nonAvatar.jpg')}
                         style={styles.image}
                     />
                 </View>
-                <Text style={[{ fontSize: 22, fontWeight: 'bold' }]}>Admin</Text>
+                <Text style={[{ fontSize: 22, fontWeight: 'bold' }]}>{`${user.first_name} ${user.last_name}`}</Text>
             </View>
             <DrawerItemList {...props} />
         </SafeAreaView>

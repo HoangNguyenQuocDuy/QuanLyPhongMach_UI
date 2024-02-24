@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewSchedules, fetchSchedulesData } from '../../store/slice/scheduleSlice';
 import ScheduleItem from '../../components/ScheduleItem/ScheduleItem';
 import { useDebounce } from 'use-debounce';
-import moment from 'moment';
 import newRequest from '../../ultils/request';
 import { setIsLoadSchedulesSearched, setScheduleIdActive, toggleIsOpenAddScheduleBox } from '../../store/slice/appSlice';
 
@@ -16,7 +15,6 @@ const Schedule = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [searchScheduleValue, setSearchScheduleValue] = useState('')
   const [debouncedSearchScheduleValue] = useDebounce(searchScheduleValue, 2000);
-  const [prevDebounce, setPrevDebounce] = useState(debouncedSearchScheduleValue)
   const { access_token } = useSelector(state => state.account)
   const [isFetchedSchedulesToday, setIsFetchedSchedulesToday] = useState(false)
   const [schedulesTodday, setSchedulesToday] = useState([])

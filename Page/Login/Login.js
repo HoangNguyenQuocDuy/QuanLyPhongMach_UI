@@ -17,6 +17,12 @@ function Login({ navigation }) {
             .then(data => {
                 dispatch(login({ ...data.payload, username }))
                 dispatch(fetchUserData(username))
+                .then(data => {
+                    console.log('Data user login: ', data.payload)
+                })
+                .catch(err => {
+                    console.log('Error when get user login data: ', err)
+                })
 
                 // if (role === 'Admin') {
                 //     navigation.navigate('Admin')s

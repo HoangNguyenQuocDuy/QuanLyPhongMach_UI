@@ -14,8 +14,13 @@ const initialState = {
 export const fetchUserData = createAsyncThunk(
     'user/fetchUserData',
     async (username) => {
-        const response = await newRequest.get(`/users/${username}/`)
-        return response.data
+        try {
+            const response = await newRequest.get(`/users/${username}/`)
+            return response.data
+        }
+        catch (err) {
+            console.log('Error from createMedicine: ', err)
+        }
     }
 )
 
@@ -29,13 +34,13 @@ export const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchUserData.fulfilled, (state, action) => {
-            state.username = action.payload.data.username
-            state.first_name = action.payload.data.first_name
-            state.last_name = action.payload.data.last_name
-            state.gender = action.payload.data.gender
-            state.avatar = action.payload.data.avatar || ''
-            state.birth = action.payload.data.birth
-            state.role = action.payload.data.group_name
+            state.username = action.payload.username
+            state.first_name = action.payload.first_name
+            state.last_name = action.payload.last_name
+            state.gender = action.payload.gender
+            state.avatar = action.payload.avatar || ''
+            state.birth = action.payload.birth
+            state.role = action.payload.group_name
         })
     }
 })

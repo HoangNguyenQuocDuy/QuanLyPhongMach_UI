@@ -11,7 +11,9 @@ import Schedule from "../Schedule/Schedule";
 import LogoutScreen from "../../components/LogoutScreen/LogoutScreen";
 import ScheduleInfo from "../../components/ScheduleInfo/ScheduleInfo";
 import AddScheduleBox from "../../components/AddScheduleBox/AddScheduleBox";
-
+import Medicine from '../Medicine/Medicine'
+import MedicineInfo from "../../components/MedicineInfo/MedicineInfo";
+import AddMedicineBox from "../../components/AddMedicineBox/AddMedicineBox";
 
 const Drawer = createDrawerNavigator();
 
@@ -19,7 +21,7 @@ function Wrapper() {
   const user = useSelector(state => state.user)
   const account = useSelector(state => state.account)
   const { isOpenUserInfoTag, isOpenAddUserBox, isOpenScheduleInfo,
-    isOpenAddScheduleBox }
+    isOpenAddScheduleBox, isOpenUpdateMedicineBox, isOpenAddMedicineBox }
     = useSelector(state => state.app)
 
   return (
@@ -50,6 +52,15 @@ function Wrapper() {
                   //   )
                 }}
               />
+              <Drawer.Screen name="Medicine" component={Medicine}
+                options={{
+                  //   drawerLabel: "Admin", 
+                  title: "Medicine",
+                  //   drawerIcon: () => (
+
+                  //   )
+                }}
+              />
 
               <Drawer.Screen
                 name="Logout"
@@ -66,6 +77,8 @@ function Wrapper() {
       {isOpenAddUserBox && <AddUserBox />}
       {isOpenScheduleInfo && <ScheduleInfo />}
       {isOpenAddScheduleBox && <AddScheduleBox />}
+      {isOpenUpdateMedicineBox && <MedicineInfo />}
+      {isOpenAddMedicineBox && <AddMedicineBox />}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { Formik } from "formik";
+// import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Image, ScrollView, View } from "react-native";
 import { StyleSheet, Text, TextInput } from "react-native";
@@ -16,6 +16,8 @@ import { useDebounce } from "use-debounce";
 import { setIsLoadSchedulesSearched, setShowConfirmation, toggleIsOpenScheduleInfo } from "../../store/slice/appSlice";
 import { deleteSchedule, updateSchedules } from "../../store/slice/scheduleSlice";
 import ConfirmBox from "../ConfirmBox/ConfirmBox";
+import { addNewDoctors } from "../../store/slice/doctorsSlice";
+import { addNewNurses } from "../../store/slice/nurseSlice";
 
 function ScheduleInfo() {
     const dispatch = useDispatch()
@@ -113,6 +115,7 @@ function ScheduleInfo() {
                     .then(data => {
                         const exitedIds = scheduleDoctors.map(doctor => doctor.id)
                         const _data = data.data.filter(doctor => !exitedIds.includes(doctor.id))
+                        dispatch(addNewDoctors(data.data))
                         setSearchedDoctors(_data)
                     })
                     .catch(err => {
@@ -135,6 +138,7 @@ function ScheduleInfo() {
                     .then(data => {
                         const exitedIds = scheduleNurses.map(nurses => nurses.id)
                         const _data = data.data.filter(nurse => !exitedIds.includes(nurse.id))
+                        dispatch(addNewNurses(data.data))
                         setSearchedNurses(_data)
                     })
                     .catch(err => {
@@ -204,17 +208,25 @@ function ScheduleInfo() {
                                 marginBottom: 20
                             }]}>
                                 <Text style={[styles.title, { marginLeft: 25, textAlign: 'center' }]}>
-                                    SCHEDULE
+                                    Schedule
                                 </Text>
-                                <TouchableOpacity style={[{ marginRight: 40 }]} onPress={() => { dispatch(toggleIsOpenScheduleInfo()) }}>
-                                    <Icons2 name="close" size={50} color={'black'} />
+                                <TouchableOpacity style={[{
+                                    backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+                                    display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                                    borderRadius: 8, marginRight: 30
+                                }]}
+                                    onPress={() => {
+                                        dispatch(toggleIsOpenScheduleInfo())
+                                    }}
+                                >
+                                    <Icons2 name='close' size={26} color={'white'} />
                                 </TouchableOpacity>
                             </View>
 
                             {date > new Date() &&
                                 <>
                                     <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center', marginLeft: 25 }]}>
-                                        <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Schedule time</Text>
+                                        <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Schedule time</Text>
                                     </View>
                                     <View style={styles.container}>
                                         <View style={styles.picker}>
@@ -250,7 +262,7 @@ function ScheduleInfo() {
                             }
 
                             <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center', marginLeft: 25 }]}>
-                                <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Description</Text>
+                                <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Description</Text>
                             </View>
                             <View style={[styles.container]}>
                                 <TextInput
@@ -270,7 +282,7 @@ function ScheduleInfo() {
                                     marginLeft: 25
                                 }]}>
                                     <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center' }]}>
-                                        <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Doctors</Text>
+                                        <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Doctors</Text>
                                     </View>
 
                                     {/* search box */}
@@ -364,7 +376,7 @@ function ScheduleInfo() {
 
 
                                     <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center' }]}>
-                                        <Text style={[styles.title, { marginBottom: 6, marginTop: 20 }]}>Nurses</Text>
+                                        <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Nurses</Text>
                                     </View>
                                     <View style={[{ marginTop: 4, position: 'relative' }]}>
                                         <View style={[{
@@ -470,10 +482,10 @@ function ScheduleInfo() {
                         display: 'flex', justifyContent:'center',
                         alignItems: 'center', flexDirection: 'row'
                  }]}> */}
-                        {showConfirmation &&
-                            <ConfirmBox handleAction={handleDeleteSchedule}
-                                title={'Do you want to delete this schedule?'}
-                            />}
+                    {showConfirmation &&
+                        <ConfirmBox handleAction={handleDeleteSchedule}
+                            title={'Do you want to delete this schedule?'}
+                        />}
                     {/* </View> */}
                 </GestureHandlerRootView>
             }

@@ -10,6 +10,7 @@ function UserTag({ username, first_name, last_name, avatar, speciality, faculty,
 
     return (
         <TouchableOpacity onPress={() => {
+            console.log(username)
             dispatch(setUsernameTagActive(username))
             dispatch(toggleIsOpenUserInfoTag())
             speciality && dispatch(setOptionUserTagActive(speciality))
@@ -19,7 +20,9 @@ function UserTag({ username, first_name, last_name, avatar, speciality, faculty,
             <View style={styles.container}>
                 <View>
                     <Image
-                        source={avatar ? avatar : require('../../assets/images/nonAvatar.jpg')}
+                        source={avatar 
+                            ? { uri: avatar.substring(avatar.indexOf('image/upload/') + 'image/upload/'.length) }  
+                            : require('../../assets/images/nonAvatar.jpg')}
                         style={styles.img}
                     />
                 </View>

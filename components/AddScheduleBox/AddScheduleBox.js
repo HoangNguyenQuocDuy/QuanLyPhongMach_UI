@@ -16,12 +16,13 @@ import { useDebounce } from "use-debounce";
 import { setIsLoadSchedulesSearched, setShowConfirmation, toggleIsOpenAddScheduleBox, toggleIsOpenScheduleInfo } from "../../store/slice/appSlice";
 import { createSchedule, deleteSchedule, updateSchedules } from "../../store/slice/scheduleSlice";
 import ConfirmBox from "../ConfirmBox/ConfirmBox";
+import { addNewDoctors } from "../../store/slice/doctorsSlice";
+import { addNewNurses } from "../../store/slice/nurseSlice";
 
 function AddScheduleBox() {
     const dispatch = useDispatch()
     const { scheduleIdActive, showConfirmation } = useSelector(state => state.app)
     const [schedule, setSchedule] = useState()
-    const doctors = useSelector(state => state.doctors)
     const nurses = useSelector(state => state.nurses)
     const [scheduleDoctors, setScheduleDoctors] = useState([])
     const [scheduleNurses, setScheduleNurses] = useState([])
@@ -82,6 +83,7 @@ function AddScheduleBox() {
                     .then(data => {
                         const exitedIds = scheduleDoctors.map(doctor => doctor.id)
                         const _data = data.data.filter(doctor => !exitedIds.includes(doctor.id))
+                        dispatch(addNewDoctors(data.data))
                         setSearchedDoctors(_data)
                     })
                     .catch(err => {
@@ -104,6 +106,7 @@ function AddScheduleBox() {
                     .then(data => {
                         const exitedIds = scheduleNurses.map(nurses => nurses.id)
                         const _data = data.data.filter(nurse => !exitedIds.includes(nurse.id))
+                        dispatch(addNewNurses(data.data))
                         setSearchedNurses(_data)
                     })
                     .catch(err => {
@@ -115,6 +118,7 @@ function AddScheduleBox() {
             setSearchedNurses([])
         }
     }, [debouncedSearchDoctorsValue, debouncedSearchNursesValue])
+    const doctors = useSelector(state => state.doctors)
 
     const handleExceptStaff = ({ id, role }) => {
         if (role === 'Doctor') {
@@ -125,6 +129,7 @@ function AddScheduleBox() {
     }
 
     const handleCheckStaffsSearch = ({ id, role }) => {
+        console.log(id, role)
         if (role === 'Doctor') {
             const pickedDoctor = doctors.find(doctor => doctor.id === id)
             console.log(pickedDoctor)
@@ -169,16 +174,24 @@ function AddScheduleBox() {
                         marginBottom: 20
                     }]}>
                         <Text style={[styles.title, { marginLeft: 25, textAlign: 'center' }]}>
-                            SCHEDULE
+                            Schedule
                         </Text>
-                        <TouchableOpacity style={[{ marginRight: 40 }]} onPress={() => { dispatch(toggleIsOpenScheduleInfo()) }}>
-                            <Icons2 name="close" size={50} color={'black'} />
+                        <TouchableOpacity style={[{
+                            backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+                            display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
+                            borderRadius: 8, marginRight:30
+                        }]}
+                            onPress={() => {
+                                dispatch(toggleIsOpenAddScheduleBox())
+                            }}
+                        >
+                            <Icons2 name='close' size={26} color={'white'} />
                         </TouchableOpacity>
                     </View>
 
 
                     <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center', marginLeft: 25 }]}>
-                        <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Schedule time</Text>
+                        <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Schedule time</Text>
                     </View>
                     <View style={styles.container}>
                         <View style={styles.picker}>
@@ -210,7 +223,7 @@ function AddScheduleBox() {
 
                     </View>
                     <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center', marginLeft: 25 }]}>
-                        <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Description</Text>
+                        <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Description</Text>
                     </View>
                     <View style={[styles.container]}>
                         <TextInput
@@ -224,7 +237,7 @@ function AddScheduleBox() {
 
                     <View style={[{ marginLeft: 25 }]}>
                         <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center' }]}>
-                            <Text style={[styles.title, { marginBottom: 6, marginTop: 4 }]}>Doctors</Text>
+                            <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Doctors</Text>
                         </View>
 
                         {/* search box */}
@@ -289,7 +302,7 @@ function AddScheduleBox() {
 
                             <View style={[{ marginLeft: 10, width: '86%', }]}>
                                 {
-                                    scheduleDoctors.length > 0 && scheduleDoctors.map(doctor => (
+                                    scheduleDoctors.length > 0 && scheduleDoctors.map(doctor =>doctor && (
                                         <View key={doctor.id} style={[styles.flex, { alignItems: 'center', marginBottom: 6, justifyContent: 'space-between' }]}>
                                             <View style={[styles.flex, { alignItems: 'center', marginBottom: 6 }]}>
                                                 <View>
@@ -318,7 +331,7 @@ function AddScheduleBox() {
 
 
                         <View style={[styles.flex, { justifyContent: 'space-between', alignItems: 'center' }]}>
-                            <Text style={[styles.title, { marginBottom: 6, marginTop: 20 }]}>Nurses</Text>
+                            <Text style={[{ marginBottom: 4, fontSize: 20, fontWeight: 'bold' }]}>Nurses</Text>
                         </View>
                         <View style={[{ marginTop: 4, position: 'relative', paddingBottom: 120 }]}>
                             <View style={[{

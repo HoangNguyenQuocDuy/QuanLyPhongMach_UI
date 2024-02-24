@@ -82,6 +82,12 @@ export const doctorsSlice = createSlice({
         clearNurses: () => {
             return initialState
         },
+        addNewNurses: (state, action) => {
+            const exitingIds = state.map(nurse => nurse.id) 
+            const newNurses = action.payload.filter(nurse => !exitingIds.includes(nurse.id))
+            
+            return [...state, ...newNurses]
+        }
         // deleteDoctor: (state, action) => {
         //     const newDoctors = state.results.filter(doctor => doctor.id !== action.payload)
         //     return {
@@ -122,16 +128,13 @@ export const doctorsSlice = createSlice({
                 return [...newNurses]
             }),
             builder.addCase(createNurse.fulfilled, (state, action) => {
-                return [
-                    ...state,
-                    action.payload
-                ]
+                return [...state]
             })
     }
 })
 
 export const {
-    clearNurses
+    clearNurses, addNewNurses
 } = doctorsSlice.actions
 
 export default doctorsSlice.reducer
