@@ -8,7 +8,8 @@ const initialState = {
     gender: '',
     avatar: '',
     birth: '',
-    role: ''
+    role: '',
+    email: ''
 }
 
 export const fetchUserData = createAsyncThunk(
@@ -41,6 +42,7 @@ export const userSlice = createSlice({
             state.avatar = action.payload.avatar || ''
             state.birth = action.payload.birth
             state.role = action.payload.group_name
+            state.email = action.payload.email
         })
     }
 })

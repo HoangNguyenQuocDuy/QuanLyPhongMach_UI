@@ -82,7 +82,7 @@ export const createMedicine = createAsyncThunk(
     }
 )
 
-export const scheduleSlice = createSlice({
+export const medicineSlice = createSlice({
     name: 'medicines',
     initialState,
     reducers: {
@@ -162,8 +162,8 @@ export const scheduleSlice = createSlice({
 })
 
 export const {
-    clearNurses,
+    clearMedicines,
     addNewMedicines
-} = scheduleSlice.actions
+} = medicineSlice.actions
 
-export default scheduleSlice.reducer
+export default medicineSlice.reducer

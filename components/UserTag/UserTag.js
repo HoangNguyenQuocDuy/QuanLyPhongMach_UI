@@ -4,20 +4,25 @@ import { setOptionUserTagActive, setUserRoleIdTagActive, setUsernameTagActive, t
 import { useDispatch } from "react-redux";
 import TruncatedText from "../TruncatedText/TruncatedText";
 
-function UserTag({ username, first_name, last_name, avatar, speciality, faculty, id }) {
+function UserTag({ username, first_name, last_name, avatar, speciality, faculty, id, check, handle }) {
 
     const dispatch = useDispatch()
 
     return (
-        <TouchableOpacity onPress={() => {
-            console.log(username)
-            dispatch(setUsernameTagActive(username))
-            dispatch(toggleIsOpenUserInfoTag())
-            speciality && dispatch(setOptionUserTagActive(speciality))
-            faculty && dispatch(setOptionUserTagActive(faculty))
-            dispatch(setUserRoleIdTagActive(id))
+        <TouchableOpacity style={[check && {marginLeft:10}]} onPress={() => {
+            if (!check) {
+                dispatch(setUsernameTagActive(username))
+                dispatch(toggleIsOpenUserInfoTag())
+                speciality && dispatch(setOptionUserTagActive(speciality))
+                faculty && dispatch(setOptionUserTagActive(faculty))
+                dispatch(setUserRoleIdTagActive(id))
+            } else {
+                handle({
+                    username, first_name, last_name, avatar, speciality, id
+                })
+            }
         }}>
-            <View style={styles.container}>
+            <View style={[styles.container]}>
                 <View>
                     <Image
                         source={avatar 
@@ -31,10 +36,10 @@ function UserTag({ username, first_name, last_name, avatar, speciality, faculty,
                         <Text style={[{ fontSize: 16, fontWeight: 'bold' }]}>{first_name}</Text>
                         <Text style={[{ fontSize: 16, fontWeight: 'bold', marginLeft: 4 }]}>{last_name}</Text>
                     </View>
-                    {speciality && <TruncatedText text={`Speciality: ${speciality}`} maxLength={24} />}
-                    {faculty && <TruncatedText text={`Faculty: ${faculty}`} maxLength={24} />}
+                    {speciality && <TruncatedText text={`Speciality: ${speciality}`} maxLength={check ? 20 : 24} />}
+                    {faculty && <TruncatedText text={`Faculty: ${faculty}`} maxLength={check ? 20 : 24} />}
                 </View>
-                {/* <View style={styles.userInfo} ><Text>abc</Text></View> */}
+                
             </View>
         </TouchableOpacity>
     );

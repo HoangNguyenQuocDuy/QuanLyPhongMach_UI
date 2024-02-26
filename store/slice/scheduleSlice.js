@@ -47,7 +47,7 @@ export const updateSchedules = createAsyncThunk(
 )
 
 export const deleteSchedule = createAsyncThunk(
-    'schedules/deleteNurse',
+    'schedules/deleteSchedule',
     async ({ access_token, scheduleId }) => {
         try {
             const response = await newRequest.delete(`/schedules/${scheduleId}/`, {
@@ -148,7 +148,7 @@ export const scheduleSlice = createSlice({
 })
 
 export const {
-    clearNurses,
+    clearSchedules,
     addNewSchedules
 } = scheduleSlice.actions
 

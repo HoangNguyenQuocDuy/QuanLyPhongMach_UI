@@ -48,7 +48,7 @@ export const patientsSlice = createSlice({
         },
         addNewPatients: (state, action) => {
             const existingIds = state.results.map(patient => patient.id)
-            const newPatients = action.payload.results.filter(
+            const newPatients = action.payload.filter(
                 patient => !existingIds.includes(patient.id)
             )
             console.log('addnewpatients: ', {
@@ -60,6 +60,41 @@ export const patientsSlice = createSlice({
                 ...state,
                 count: state.count + newPatients.length,
                 results: [...state.results, ...newPatients]
+            }
+        },
+        addPatient: (state, action) => {
+            if (Object.keys(state).length > 0) {
+                const isPatientExists = state.results.some(patient => patient.id === action.payload.id)
+                if (isPatientExists) {
+                    return state;
+                }
+
+                return {
+                    ...state,
+                    count: state.count + 1,
+                    results: [...state.results, action.payload]
+                };
+
+            } else {
+                return {
+                    ...state,
+                    count: 1,
+                    results: [action.payload]
+                }
+            }
+            const existingIds = state.results.map(patient => patient.id)
+            const newPatient = action.payload.find(
+                patient => !existingIds.includes(patient.id)
+            )
+            console.log('addnewpatient: ', {
+                ...state,
+                count: state.count + 1,
+                results: [...state.results, newPatient]
+            })
+            return {
+                ...state,
+                count: state.count + 1,
+                results: [...state.results, newPatient]
             }
         }
     },
@@ -87,7 +122,7 @@ export const patientsSlice = createSlice({
 
 export const {
     clearPatients,
-    addNewPatients
+    addNewPatients, addPatient
 } = patientsSlice.actions
 
 export default patientsSlice.reducer

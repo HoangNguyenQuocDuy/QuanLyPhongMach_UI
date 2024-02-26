@@ -31,23 +31,6 @@ export const fetchLogin = createAsyncThunk(
     }
 )
 
-// export const fetchRefreshToken = createAsyncThunk(
-//     'account/fetchRefreshToken',
-//     async ({ refreshToken }) => {
-
-//         try {
-//             const response = await newRequet.post('/auth/refreshToken', {
-//                 refreshToken
-//             })
-//             return response.data.data;
-//         } catch (error) {
-//             throw error;
-//         }
-
-//         // return response.data.data
-//     }
-// )
-
 export const accountSlice = createSlice({
     name: 'account',
     initialState,
