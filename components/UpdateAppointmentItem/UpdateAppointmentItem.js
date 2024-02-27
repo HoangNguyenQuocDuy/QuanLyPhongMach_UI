@@ -13,9 +13,9 @@ import { useDebounce } from "use-debounce";
 import { fetchDoctorsData } from "../../store/slice/doctorsSlice";
 import UserTag from "../UserTag/UserTag";
 import { updateAppointments } from "../../store/slice/appointmentsSlice";
-import { setIsReloadAppointment } from "../../store/slice/appSlice";
+import { setIsReloadAppointment, setSelectedAppointment } from "../../store/slice/appSlice";
 
-function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason }) {
+function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason, get, navigation, patient_id }) {
     const { access_token } = useSelector(state => state.account)
     const dispatch = useDispatch()
     const date = moment.utc(scheduled_time).format('DD/MM/yyyy')
@@ -36,14 +36,14 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason 
             confirmed: true
         }
 
-        dispatch(updateAppointments({ access_token, appointmentId:id, updateData:data }))
-        .then(data => {
-            console.log('data from update appointment: ', data.payload)
-            dispatch(setIsReloadAppointment(true))
-        })
-        .catch(err => {
-            console.log('err when update appointment: ', err)
-        })
+        dispatch(updateAppointments({ access_token, appointmentId: id, updateData: data }))
+            .then(data => {
+                console.log('data from update appointment: ', data.payload)
+                dispatch(setIsReloadAppointment(true))
+            })
+            .catch(err => {
+                console.log('err when update appointment: ', err)
+            })
     }
 
     const handleGetDoctors = async () => {
@@ -147,12 +147,32 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason 
                         </>
                     }
 
-                    <TouchableOpacity onPress={() => { setIsFetchDoctors(!isFetchDoctors) }} style={[{ marginVertical: 4 }]}>
-                        <View style={[styles.flex, { alignItems: 'center' }]}>
-                            <Icons2 name="pluscircleo" size={30} color={'#A5DD9B'} />
-                            <Text style={[styles.text, { color: '#A5DD9B', fontWeight: '500', marginLeft: 10 }]}>Doctor</Text>
+                    {
+                        get &&
+                        <View style={[styles.flex, { width: '100%', justifyContent: 'center' }]}>
+                            <TouchableOpacity onPress={() => {
+                                dispatch(setSelectedAppointment({
+                                    patient_id, id, date, hour, name: `${_patient.user.first_name} ${_patient.user.last_name}`,
+                                    email: _patient.user.email, reason
+                                }))
+                                navigation.navigate('Prescriptions')
+
+                            }} style={[styles.button]}>
+                                <Text style={[styles.buttonText]}>
+                                    View to make presciption
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    }
+
+                    {
+                        !get && <TouchableOpacity onPress={() => { setIsFetchDoctors(!isFetchDoctors) }} style={[{ marginVertical: 4 }]}>
+                            <View style={[styles.flex, { alignItems: 'center' }]}>
+                                <Icons2 name="pluscircleo" size={30} color={'#A5DD9B'} />
+                                <Text style={[styles.text, { color: '#A5DD9B', fontWeight: '500', marginLeft: 10 }]}>Doctor</Text>
+                            </View>
+                        </TouchableOpacity>
+                    }
                     {
                         selecteddDoctor &&
                         <View style={[{ position: 'relative' }]}>
@@ -169,7 +189,7 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason 
                     }
 
                     {
-                        isFetchDoctors ?
+                        isFetchDoctors && !get ?
                             <Shadow distance={2} startColor="#F6F5F5" offset={[-2, 22]}
                                 style={[styles.shadow, styles.shadowRadius, {
                                     width: '100%', marginTop: 20, marginBottom: 10
@@ -268,7 +288,23 @@ const styles = StyleSheet.create({
     },
     shadowRadius: {
         borderRadius: 20
-    }
+    },
+    button: {
+        width: '100%',
+        backgroundColor: '#3787eb',
+        height: 46,
+        borderRadius: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 8,
+        paddingHorizontal: 16
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
 })
 
 export default UpdateAppointmentItem;

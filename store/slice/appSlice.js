@@ -19,6 +19,7 @@ const initialState = {
     isAlreadyRegister: false,
     isOpenAddAppointmentBox: false,
     isReloadAppointment: false,
+    selectedAppointment: {}
 }
 
 
@@ -133,7 +134,16 @@ export const appSlice = createSlice({
                 ...state,
                 isReloadAppointment: action.payload
             }
-        } 
+        },
+        setSelectedAppointment: (state, action) => {
+            const { id, hour, date, name, email, reason, patient_id } = action.payload
+            return {
+                ...state,
+                selectedAppointment:{
+                    id, hour, date, name, email, reason, patient_id
+                }
+            }
+        }
     },
     extraReducers: (builder) => {
 
@@ -147,5 +157,5 @@ export const { toggleIsOpenUserInfoTag, setUsernameTagActive, setIsOpenAddUserBo
     setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive,
     setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox, toggleIsOpenUpdateMedicineBox,
     setMedicineIdActive, setIsLoadMedicinesSearched, toggleIsOpenAddMedicineBox,
-    setIsAlreadyRegister, toggleIsOpenAddAppointmentBox, setIsReloadAppointment }
+    setIsAlreadyRegister, toggleIsOpenAddAppointmentBox, setIsReloadAppointment, setSelectedAppointment }
     = appSlice.actions

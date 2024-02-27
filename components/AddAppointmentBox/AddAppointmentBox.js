@@ -75,7 +75,7 @@ function AddAppointmentBox() {
                         <View style={[{ width: '100%' }]}>
                             <View>
                                 <Text style={[styles.title, { marginTop: 20, textAlign: 'left' }]}>Personal infomation</Text>
-                                <View style={[{ width: '100%', position: 'relative' }]}>
+                                <View style={[styles.flex,{ width: '100%', position: 'relative' }]}>
                                     <TextInput
                                         style={[styles.input, styles.inputActive]}
                                         placeholder="Fullname..."
@@ -90,7 +90,7 @@ function AddAppointmentBox() {
                                         <Icons4 name="person-outline" size={26} color={'#999'} />
                                     </View>
                                 </View>
-                                <View style={[{ width: '100%', position: 'relative' }]}>
+                                <View style={[styles.flex,{ width: '100%', position: 'relative' }]}>
                                     <TextInput
                                         style={[styles.input, email !== '' && styles.inputActive]}
                                         placeholder="Email..."
@@ -106,10 +106,10 @@ function AddAppointmentBox() {
                                         <Icons5 name="email" size={26} color={email === '' ? '#999' : '#444'} />
                                     </View>
                                 </View>
-                                <View style={[{ width: '100%', position: 'relative' }]}>
+                                <View style={[{ width: '100%', position: 'relative', paddingLeft:6, }]}>
                                     <View >
                                         <TextInput
-                                            style={[styles.input, email !== '' && styles.inputActive]}
+                                            style={[styles.input, email !== '' && styles.inputActive, {width:'97%'}]}
                                             placeholder="Email..."
                                             name='email'
                                             value={format(birth, 'dd/MM/yyyy')}
@@ -129,8 +129,8 @@ function AddAppointmentBox() {
                             <View style={[{ width: '100%' }]}>
                                 <Text style={[styles.title, { marginTop: 20 }]}>Time appointment</Text>
 
-                                <View style={[{ width: '100%', position: 'relative' }]}>
-                                    <TouchableOpacity onPress={() => setShowDateAppointmentPicker(true)}>
+                                <View style={[{ width: '100%', position: 'relative', paddingLeft:6 }]}>
+                                    <TouchableOpacity style={[{ width:'100%' }]} onPress={() => setShowDateAppointmentPicker(true)}>
                                         <Text style={[styles.input, dateAppointment && styles.inputActive]}>
                                             {dateAppointment ? format(dateAppointment, 'dd/MM/yyyy') : "Select the time..."}
                                         </Text>
@@ -178,9 +178,9 @@ function AddAppointmentBox() {
                             <View style={[{ width: '100%', position: 'relative' }]}>
                                 <Text style={[styles.title, { marginTop: 36 }]}>Medical examination reason</Text>
 
-                                <View >
+                                <View style={[styles.flex]}>
                                     <TextInput
-                                        style={[styles.input, reason !== '' && styles.inputActive]}
+                                        style={[styles.input, reason !== '' && styles.inputActive, { marginRight:10 }]}
                                         placeholder="Reason..."
                                         name='reason'
                                         value={reason}
@@ -191,7 +191,7 @@ function AddAppointmentBox() {
                                         top: '12%',
 
                                     },]}>
-                                        <Icons name="edit" size={26} color={reason === '' ? '#999' : '#444'} />
+                                        <Icons name="edit" size={26} color={reason === '' ? '#E3E1D9' : '#444'} />
                                     </View>
                                 </View>
                             </View>
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
         height: 42,
         borderRadius: 10,
         paddingHorizontal: 10,
-        width: '100%',
+        width: '96%',
         marginBottom: 20,
         fontSize: 16,
         borderWidth: 1,
@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     },
     hourItemActive: {
         backgroundColor: '#e8f0fd',
+        borderColor: '#2377f5'
     },
     hourItemTextActive: {
         color: '#2377f5',
@@ -287,6 +288,12 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
     },
+    flex: {
+        display:'flex',
+        justifyContent:'center',
+        alignItems: 'center',
+        flexDirection:'row'
+    }
 })
 
 export default AddAppointmentBox;
