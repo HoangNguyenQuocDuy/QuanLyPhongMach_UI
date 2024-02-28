@@ -23,18 +23,23 @@ function ScheduleItem({ schedule_time, nurseIds, doctorIds, date, scheduleId }) 
         handleGetDoctorById({ ids: doctorIds, type: 'Doctors' })
         handleGetDoctorById({ ids: nurseIds, type: 'Nurses' })
     }, [])
+    console.log('doctors ', doctors)
     const handleGetDoctorById = ({ ids, type }) => {
         if (type === 'Doctors') {
             setScheduleDoctors(doctors.filter(doctor => ids.includes(doctor.id)))
+            console.log('doctors ', doctors)
         } else {
             setScheduleNurses(nurses.filter(nurse => ids.includes(nurse.id)))
         }
     }
 
+    console.log('scheduleNurses ', scheduleNurses)
+
     const handleToggleList = (name) => {
         if (name === 'Doctors') {
             setIsShowScheduleDoctors(!isShowScheduleDoctors)
             setIsDoctorIconRotated(!isDoctorIconRotated);
+            console.log(1)
         } else {
             setIsShowScheduleNurses(!isShowScheduleNurses)
             setIsNurseIconRotated(!isNurseIconRotated);

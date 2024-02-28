@@ -52,9 +52,9 @@ function Login({ navigation }) {
             if (role === 'Admin') {
                 navigation.navigate('Admin')
             } else if (role === 'Doctor') {
-                navigation.navigate('Doctor')
+                navigation.navigate('Appointment')
             } else if (role === 'Nurse') {
-                navigation.navigate('Nurse')
+                navigation.navigate('Manage appointment')
             }
         }
     }, [role]);

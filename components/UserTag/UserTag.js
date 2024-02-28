@@ -4,7 +4,7 @@ import { setOptionUserTagActive, setUserRoleIdTagActive, setUsernameTagActive, t
 import { useDispatch } from "react-redux";
 import TruncatedText from "../TruncatedText/TruncatedText";
 
-function UserTag({ username, first_name, last_name, avatar, speciality, faculty, id, check, handle }) {
+function UserTag({ username, first_name, last_name, avatar, speciality, faculty, major, id, check, handle }) {
 
     const dispatch = useDispatch()
 
@@ -17,8 +17,11 @@ function UserTag({ username, first_name, last_name, avatar, speciality, faculty,
                 faculty && dispatch(setOptionUserTagActive(faculty))
                 dispatch(setUserRoleIdTagActive(id))
             } else {
-                handle({
+                speciality && handle({
                     username, first_name, last_name, avatar, speciality, id
+                })
+                major && handle({
+                    username, first_name, last_name, avatar, major, id
                 })
             }
         }}>
@@ -38,6 +41,7 @@ function UserTag({ username, first_name, last_name, avatar, speciality, faculty,
                     </View>
                     {speciality && <TruncatedText text={`Speciality: ${speciality}`} maxLength={check ? 20 : 24} />}
                     {faculty && <TruncatedText text={`Faculty: ${faculty}`} maxLength={check ? 20 : 24} />}
+                    {major && <TruncatedText text={`Major: ${major}`} maxLength={check ? 20 : 24} />}
                 </View>
                 
             </View>

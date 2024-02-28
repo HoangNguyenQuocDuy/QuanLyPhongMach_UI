@@ -4,13 +4,13 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { GestureHandlerRootView, ScrollView, TextInput } from "react-native-gesture-handler";
 import { useDebounce } from "use-debounce";
 import Icons2 from 'react-native-vector-icons/MaterialCommunityIcons'
-import { fetchAppointmentsData } from "../../../store/slice/appointmentsSlice";
+import { fetchAppointmentsData } from "../../store/slice/appointmentsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { Platform } from "react-native";
 import { Shadow } from "react-native-shadow-2";
-import AppointmentItem from "../../../components/AppointmentItem/AppointmentItem";
-import UpdateAppointmentItem from "../../../components/UpdateAppointmentItem/UpdateAppointmentItem";
+import AppointmentItem from "../../components/AppointmentItem/AppointmentItem";
+import UpdateAppointmentItem from "../../components/UpdateAppointmentItem/UpdateAppointmentItem";
 
 function DoctorAppointment({ navigation }) {
     const dispatch = useDispatch()

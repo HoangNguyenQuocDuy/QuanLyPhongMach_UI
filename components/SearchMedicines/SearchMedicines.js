@@ -111,22 +111,11 @@ function SearchMedicines({ medicinesPres, setMedicinesPres }) {
 
     useEffect(() => {
         if (debounceSearchValue !== ''
-            // && !isOpenUpdateMedicineBox && !isLoadMedicinesSearched
-            // && !isOpenAddMedicineBox
         ) {
             console.log('debouncedSearchScheduleValue ', debounceSearchValue)
             console.log(1)
             findMedicines()
         }
-        // else if (debounceSearchValue !== ''
-        // //  && !isOpenUpdateMedicineBox && isLoadMedicinesSearched && !showConfirmation
-        //  ) {
-        //     const exitIds = searchedMedicines.map(medicine => medicine.id)
-        //     const loadMedicines = medicines && medicines.results.filter(medicine => exitIds.includes(medicine.id))
-        //     console.log('loadMedicines ', loadMedicines)
-        //     setSearchedMedicines([...loadMedicines])
-        //     dispatch(setIsLoadMedicinesSearched(false))
-        // }
         else if (debounceSearchValue === '') {
             setIsFetch(false)
             setSearchMedicines([])

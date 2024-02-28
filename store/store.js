@@ -11,6 +11,7 @@ import medicineSlice from "./slice/medicineSlice";
 import patientsSlice from "./slice/patientsSlice";
 import registerSlice from "./slice/registerSlice";
 import appointmentsSlice from "./slice/appointmentsSlice";
+import medicalHistoriesSlice from "./slice/medicalHistories";
 
 const persistConfig = {
     key: 'root',
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
     medicines: medicineSlice,
     register: registerSlice,
     appointments: appointmentsSlice,
+    medicalHistories: medicalHistoriesSlice,
     app: appSlice
 })
 

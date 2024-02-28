@@ -21,6 +21,23 @@ export const fetchMedicinesData = createAsyncThunk(
 
 )
 
+export const getMedicineById = createAsyncThunk(
+    'medicines/getMedicineById',
+    async ({ access_token, id }) => {
+        try {
+            const response = await newRequest.get(`/medicines/${id}/`, {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`
+                }
+            })
+            return response.data
+        }
+        catch (err) {
+            console.log('Error from getMedicineById: ', err)
+        }
+    }
+)
+
 export const updateMedicine = createAsyncThunk(
     'medicines/updateMedicine',
     async (data) => {
@@ -96,15 +113,14 @@ export const medicineSlice = createSlice({
             )
             console.log('addnewmedicines: ', {
                 ...state,
-                count: state.count + newMedicines.length,
                 results: [...state.results, ...newMedicines]
             })
             return {
                 ...state,
-                count: state.count + newMedicines.length,
                 results: [...state.results, ...newMedicines]
             }
-        }
+        },
+
     },
     extraReducers: (builder) => {
         builder.addCase(fetchMedicinesData.fulfilled, (state, action) => {
@@ -156,6 +172,27 @@ export const medicineSlice = createSlice({
                         ...state.results,
                         ...action.payload
                     ]
+                }
+            }),
+            builder.addCase(getMedicineById.fulfilled, (state, action) => {
+                if (Object.keys(state).length > 0) {
+                    const newMedicine = state.results.find(
+                        medicine => medicine.id !== action.payload.id)
+                    if (newMedicine) {
+                        
+                        return {
+                            ...state,
+                            count: state.count + 1,
+                            results: [...state.results, newMedicine]
+                        };
+                    }
+
+                    return state
+    
+                } else {
+                    return {
+                        results: [action.payload]
+                    }
                 }
             })
     }
