@@ -10,6 +10,7 @@ import LogoutScreen from "../../components/LogoutScreen/LogoutScreen";
 import Medicine from "../Medicine/Medicine";
 import Schedule from "../Schedule/Schedule";
 import DrawerHeader from "../../components/DrawerHeader/DrawerHeader";
+import Statistic from "../Statistic/Statistic";
 
 const Drawer = createDrawerNavigator();
 
@@ -39,6 +40,16 @@ function Admin() {
                     options={{
                         //   drawerLabel: "Admin", 
                         title: "Medicine",
+                        //   drawerIcon: () => (
+
+                        //   )
+                    }}
+                />
+
+                <Drawer.Screen name="Statistic" component={Statistic}
+                    options={{
+                        //   drawerLabel: "Admin", 
+                        title: "Statistic",
                         //   drawerIcon: () => (
 
                         //   )

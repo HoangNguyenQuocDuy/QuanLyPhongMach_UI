@@ -17,9 +17,9 @@ const initialState = {
     medicineIdActive: '',
     isOpenAddMedicineBox: false,
     isAlreadyRegister: false,
-    isOpenAddAppointmentBox: false,
     isReloadAppointment: false,
-    selectedAppointment: {}
+    selectedAppointment: {},
+    emailForgotPWActive: '',
 }
 
 
@@ -123,12 +123,6 @@ export const appSlice = createSlice({
                 isAlreadyRegister: !state.isAlreadyRegister
             }
         },
-        toggleIsOpenAddAppointmentBox: (state, action) => {
-            return {
-                ...state, 
-                isOpenAddAppointmentBox: !state.isOpenAddAppointmentBox
-            }
-        },
         setIsReloadAppointment:(state, action) => {
             return {
                 ...state,
@@ -136,12 +130,15 @@ export const appSlice = createSlice({
             }
         },
         setSelectedAppointment: (state, action) => {
-            const { id, hour, date, name, email, reason, patient_id } = action.payload
             return {
                 ...state,
-                selectedAppointment:{
-                    id, hour, date, name, email, reason, patient_id
-                }
+                selectedAppointment:action.payload
+            }
+        },
+        setEmailForgotPWActive: (state, action) => {
+            return {
+                ...state,
+                emailForgotPWActive: action.payload
             }
         }
     },
@@ -157,5 +154,5 @@ export const { toggleIsOpenUserInfoTag, setUsernameTagActive, setIsOpenAddUserBo
     setTitleAddUserBox, toggleIsOpenScheduleInfo, setScheduleIdActive,
     setIsLoadSchedulesSearched, toggleIsOpenAddScheduleBox, toggleIsOpenUpdateMedicineBox,
     setMedicineIdActive, setIsLoadMedicinesSearched, toggleIsOpenAddMedicineBox,
-    setIsAlreadyRegister, toggleIsOpenAddAppointmentBox, setIsReloadAppointment, setSelectedAppointment }
+    setIsAlreadyRegister, setIsReloadAppointment, setSelectedAppointment, setEmailForgotPWActive }
     = appSlice.actions

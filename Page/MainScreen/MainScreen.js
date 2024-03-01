@@ -6,6 +6,7 @@ import Icons2 from 'react-native-vector-icons/Ionicons'
 import Icons3 from 'react-native-vector-icons/Fontisto'
 import Icons4 from 'react-native-vector-icons/FontAwesome'
 import Icons5 from 'react-native-vector-icons/Octicons'
+import Icons6 from 'react-native-vector-icons/MaterialCommunityIcons'
 import { StyleSheet, Text } from 'react-native';
 import AddAppointmentBox from '../../components/AddAppointmentBox/AddAppointmentBox';
 import Home from '../Home/Home'
@@ -15,6 +16,7 @@ import ManageAppointment from '../ManageAppointment/ManageAppointment';
 import Prescription from '../Prescription/Prescription';
 import DoctorAppointment from '../DoctorAppointment/DoctorAppointment';
 import ExaminationHistory from '../ExaminationHistory/ExaminationHistory';
+import Payment from '../Payment/Payment'
 
 const Tab = createBottomTabNavigator();
 
@@ -39,7 +41,7 @@ function MainScreen() {
                             <Tab.Screen name='Appointments' component={MyAppointment}
                                 options={{
                                     tabBarLabel: ({ focused }) => (
-                                        <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Appointments</Text>
+                                        <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Appointment</Text>
                                     ),
                                     tabBarIcon: ({ focused }) => (
                                         <Icons color={focused ? '#387ADF' : 'gray'} name='calendar' size={26} />
@@ -60,10 +62,19 @@ function MainScreen() {
                                 <Tab.Screen name='Manage appointment' component={ManageAppointment}
                                     options={{
                                         tabBarLabel: ({ focused }) => (
-                                            <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Manage appointments</Text>
+                                            <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Appointment</Text>
                                         ),
                                         tabBarIcon: ({ focused }) => (
                                             <Icons color={focused ? '#387ADF' : 'gray'} name='calendar' size={26} />
+                                        )
+                                    }} />
+                                <Tab.Screen name='Payment' component={Payment}
+                                    options={{
+                                        tabBarLabel: ({ focused }) => (
+                                            <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Payment</Text>
+                                        ),
+                                        tabBarIcon: ({ focused }) => (
+                                            <Icons2 color={focused ? '#387ADF' : 'gray'} name='wallet-outline' size={26} />
                                         )
                                     }} />
                             </> :

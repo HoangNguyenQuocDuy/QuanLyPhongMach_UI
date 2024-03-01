@@ -26,6 +26,7 @@ function ExaminationHistory() {
     const [showStartDatePicker, setShowStartDatePicker] = useState(false)
     const [showEndDatePicker, setShowEndDatePicker] = useState(false)
     const [searchedMedicalHistories, setSearchedMedicalHistories] = useState([])
+    const [mb, setMb] = useState(0)
     const [searchedPatients, setSearchedPatients] = useState([])
     const [isNextPatient, setIsNextPatient] = useState(true)
     const [isNextMedicalHistory, setIsNextMedicalHistory] = useState(true)
@@ -130,6 +131,8 @@ function ExaminationHistory() {
         handleGetSearchMedicalHistories()
     }
 
+    console.log(mb)
+
     const loadNewMedicalHistories = async () => {
         if (patientActive) {
             if (isNextMedicalHistory) {
@@ -226,6 +229,7 @@ function ExaminationHistory() {
         if (debounceStartDateValue < debounceEndDateValue) {
             console.log('get medicalHistories')
             findMedicalHistories()
+            setMb(100*searchedMedicalHistories.length)
         }
     }, [debouncePatientValue, debounceEndDateValue, debounceStartDateValue, patientActive])
 
@@ -356,30 +360,26 @@ function ExaminationHistory() {
                             </View>
                             <ScrollView
                                 onScroll={handleScrollMedicalHistories}
-                                style={[{ maxHeight: 250 }]}
+                                // style={[{ minHeight:'400%' }]}
                                 scrollEventThrottle={16}
                             >
-                                {searchedMedicalHistories.length > 0 &&
+                                <View style={[{ marginBottom:`${mb}%` }]}>
+                                    {searchedMedicalHistories.length > 0 &&
 
-                                    searchedMedicalHistories.map(medicalHistory => (
-                                        <View style={[styles.wrapper, { marginTop: 10 }]}>
-                                            <Shadow distance={14} startColor="#f0f2f5" style={styles.shadow}>
-                                                <View style={[styles.patientBox, { borderRadius: 20 }]}>
-                                                    <MedicalHistoryItem key={medicalHistory.id}
-                                                        doctor={medicalHistory.doctor} prescribed_medicines={medicalHistory.prescribed_medicines}
-                                                        symptoms={medicalHistory.symptoms} conclusion={medicalHistory.conclusion}
-                                                        created_at={medicalHistory.created_at}
-                                                    />
-                                                </View>
-                                            </Shadow>
-                                        </View>
-                                    ))
+                                        searchedMedicalHistories.map(medicalHistory => (
+                                            <MedicalHistoryItem key={medicalHistory.id} id={medicalHistory.id}
+                                                doctor={medicalHistory.doctor} prescribed_medicines={medicalHistory.prescribed_medicines}
+                                                symptoms={medicalHistory.symptoms} conclusion={medicalHistory.conclusion}
+                                                created_at={medicalHistory.created_at}
+                                            />
+                                        ))
 
-                                }
-                                {
-                                    isLoadingMedicalHistories &&
-                                    <ActivityIndicator size="large" color="#0000ff" />
-                                }
+                                    }
+                                    {
+                                        isLoadingMedicalHistories &&
+                                        <ActivityIndicator size="large" color="#0000ff" />
+                                    }
+                                </View>
                             </ScrollView>
 
                         </View>

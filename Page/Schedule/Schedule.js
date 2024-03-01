@@ -218,7 +218,11 @@ const Schedule = () => {
           </View>
 
           {
-            debouncedSearchScheduleValue === '' && schedulesTodday.length > 0 && schedulesTodday.map(schedule => (
+            debouncedSearchScheduleValue === '' && schedulesTodday.length > 0 && schedulesTodday.map(schedule => 
+              
+              {
+                console.log(schedule)
+                return (
               <ScheduleItem
                 scheduleId={schedule.id}
                 key={schedule.id}
@@ -226,7 +230,7 @@ const Schedule = () => {
                 doctorIds={schedule.doctors}
                 nurseIds={schedule.nurses}
               />
-            ))
+            )})
           }
 
           {

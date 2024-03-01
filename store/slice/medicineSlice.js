@@ -166,12 +166,17 @@ export const medicineSlice = createSlice({
                 }
             }),
             builder.addCase(createMedicine.fulfilled, (state, action) => {
-                return {
-                    ...state,
-                    results: [
-                        ...state.results,
-                        ...action.payload
-                    ]
+                if (Object.keys(state).length > 0) {
+                    return {
+                        ...state,
+                        count: state.count + 1,
+                        results: [...state.results, action.payload]
+                    };
+
+                } else {
+                    return {
+                        results: [action.payload]
+                    }
                 }
             }),
             builder.addCase(getMedicineById.fulfilled, (state, action) => {
@@ -179,7 +184,7 @@ export const medicineSlice = createSlice({
                     const newMedicine = state.results.find(
                         medicine => medicine.id !== action.payload.id)
                     if (newMedicine) {
-                        
+
                         return {
                             ...state,
                             count: state.count + 1,
@@ -188,7 +193,7 @@ export const medicineSlice = createSlice({
                     }
 
                     return state
-    
+
                 } else {
                     return {
                         results: [action.payload]

@@ -104,10 +104,14 @@ export const doctorsSlice = createSlice({
             return initialState
         },
         addNewDoctors: (state, action) => {
-            const exitingIds = state.map(doctor => doctor.id) 
-            const newDoctors = action.payload.filter(doctor => !exitingIds.includes(doctor.id))
-            
-            return [...state, ...newDoctors]
+            if (state.length > 0) {
+                const exitingIds = state.map(doctor => doctor.id) 
+                const newDoctors = action.payload.filter(doctor => !exitingIds.includes(doctor.id))
+                
+                return [...state, ...newDoctors]
+            } else {
+                return [...action.payload]
+            }
         }
         // deleteDoctor: (state, action) => {
         //     const newDoctors = state.results.filter(doctor => doctor.id !== action.payload)

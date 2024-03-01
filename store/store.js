@@ -12,6 +12,7 @@ import patientsSlice from "./slice/patientsSlice";
 import registerSlice from "./slice/registerSlice";
 import appointmentsSlice from "./slice/appointmentsSlice";
 import medicalHistoriesSlice from "./slice/medicalHistories";
+import paymentsSlice from "./slice/paymentsSlice";
 
 const persistConfig = {
     key: 'root',
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
     register: registerSlice,
     appointments: appointmentsSlice,
     medicalHistories: medicalHistoriesSlice,
+    payments: paymentsSlice,
     app: appSlice
 })
 

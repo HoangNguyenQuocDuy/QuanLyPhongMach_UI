@@ -12,10 +12,11 @@ import newRequest from "../../ultils/request";
 import { useDebounce } from "use-debounce";
 import { fetchDoctorsData } from "../../store/slice/doctorsSlice";
 import UserTag from "../UserTag/UserTag";
-import { updateAppointments } from "../../store/slice/appointmentsSlice";
+import { deleteAppointment, updateAppointments } from "../../store/slice/appointmentsSlice";
 import { setIsReloadAppointment, setSelectedAppointment } from "../../store/slice/appSlice";
 
-function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason, get, navigation, patient_id }) {
+function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, 
+    reason, get, navigation, patient_id }) {
     const { access_token } = useSelector(state => state.account)
     const dispatch = useDispatch()
     const date = moment.utc(scheduled_time).format('DD/MM/yyyy')
@@ -69,6 +70,17 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason,
             .catch(err => {
                 console.log('Err when get schedule from nurse: ', err)
             })
+    }
+
+    const handleDeleteAppointment = () => {
+        dispatch(deleteAppointment({ access_token, appointmentId:id }))
+        .then(data => {
+            console.log('delete appointment successfull - id: ', data.payload)
+            dispatch(setIsReloadAppointment(true))
+        })
+        .catch(err => {
+            console.log('err when delete appointment: ', err)
+        })
     }
 
     useEffect(() => {
@@ -127,7 +139,15 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason,
                         }
                     </View>
                     {
-                        role === 'Patient' && <Icons name='trash-2' size={26} color={'#ff6666'} />
+                        role === 'Patient' &&
+                        <View style={[styles.flex, { justifyContent:'center', marginTop:10 }]}>
+                            <TouchableOpacity onPress={handleDeleteAppointment} style={[styles.button, { width: '100%', backgroundColor:'#FF6868' }]}>
+                                <Text style={[styles.buttonText]}>
+                                    Delete appointment
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        // <Icons name='trash-2' size={26} color={'#ff6666'} />
                     }
                     {
                         _patient &&
@@ -166,7 +186,7 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason,
                     }
 
                     {
-                        !get && <TouchableOpacity onPress={() => { setIsFetchDoctors(!isFetchDoctors) }} style={[{ marginVertical: 4 }]}>
+                        role !== 'Patient' && !get && <TouchableOpacity onPress={() => { setIsFetchDoctors(!isFetchDoctors) }} style={[{ marginVertical: 4 }]}>
                             <View style={[styles.flex, { alignItems: 'center' }]}>
                                 <Icons2 name="pluscircleo" size={30} color={'#A5DD9B'} />
                                 <Text style={[styles.text, { color: '#A5DD9B', fontWeight: '500', marginLeft: 10 }]}>Doctor</Text>
@@ -189,7 +209,7 @@ function UpdateAppointmentItem({ id, scheduled_time, confirmed, patient, reason,
                     }
 
                     {
-                        isFetchDoctors && !get ?
+                        role !== 'Patient' && isFetchDoctors && !get ?
                             <Shadow distance={2} startColor="#F6F5F5" offset={[-2, 22]}
                                 style={[styles.shadow, styles.shadowRadius, {
                                     width: '100%', marginTop: 20, marginBottom: 10

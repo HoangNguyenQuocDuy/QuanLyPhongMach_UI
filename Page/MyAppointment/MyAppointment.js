@@ -6,7 +6,9 @@ import { useDebounce } from "use-debounce";
 import AppointmentItem from "../../components/AppointmentItem/AppointmentItem";
 import { fetchAppointmentsData } from "../../store/slice/appointmentsSlice";
 import { format } from "date-fns";
-import { toggleIsOpenAddAppointmentBox } from "../../store/slice/appSlice";
+import UpdateAppointmentItem from "../../components/UpdateAppointmentItem/UpdateAppointmentItem";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { setIsReloadAppointment } from "../../store/slice/appSlice";
 
 function MyAppointment() {
     const dispatch = useDispatch()
@@ -18,7 +20,7 @@ function MyAppointment() {
     const [isLoading, setIsLoading] = useState(false)
     const [page, setPage] = useState(1)
     const [searchedAppointments, setSearchedAppointments] = useState([])
-    const { showConfirmation } = useSelector(state => state.app)
+    const { showConfirmation, isReloadAppointment } = useSelector(state => state.app)
 
     const findAppointments = async () => {
         if (!isFetch) {
@@ -112,20 +114,15 @@ function MyAppointment() {
     const appointments = useSelector(state => state.appointments)
 
     useEffect(() => {
-        // console.log(isLoadAppointmentsSearched)
-
-        if (debounceSearchSchValue !== ''
-            // && !isOpenUpdateMedicineBox && !isLoadAppointmentsSearched
-            // && !isOpenAddMedicineBox
+        if (debounceSearchSchValue !== '' || isReloadAppointment
         ) {
+            dispatch(setIsReloadAppointment(false))
             findAppointments()
         }
         else if (debounceSearchSchValue !== '' && !showConfirmation
-            // && !isOpenUpdateMedicineBox && isLoadAppointmentsSearched
         ) {
             const exitIds = searchedAppointments.map(appointment => appointment.id)
             const loadAppointments = appointments && appointments.results.filter(appointment => exitIds.includes(appointment.id))
-            // console.log('loadAppointments ', loadAppointments)
             setSearchedAppointments([...loadAppointments])
             dispatch(setIsLoadAppointmentsSearched(false))
         }
@@ -148,85 +145,73 @@ function MyAppointment() {
         }
         console.log('appointments ', appointments)
 
-    }, [debounceSearchSchValue, showConfirmation,
-        //  isLoadAppointmentsSearched,
-        // isOpenUpdateMedicineBox , isOpenAddMedicineBox
+    }, [debounceSearchSchValue, showConfirmation, isReloadAppointment
     ])
 
     return (
-        <ScrollView style={[{
-            height: '100%', backgroundColor: '#fff',
-        }]}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-        >
-            <View style={[{
-                display: 'flex', justifyContent: 'center',
-                alignContent: 'flex-start', width: '100%', flexDirection: 'row', height: '100%'
-            }]}>
-                <View style={styles.container}>
-                    <View style={[{
-                        display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
-                        width: '100%', alignItems: 'center', marginTop: 16, height: 60
-                    }]}>
-                        <Text style={[styles.title, { marginTop: 10 }]}>Appointments</Text>
-                        <TouchableOpacity style={[{
-                            backgroundColor: '#3787eb', paddingHorizontal: 10, paddingVertical: 6,
+        <GestureHandlerRootView>
+            <ScrollView style={[{
+                height: '100%', backgroundColor: '#fff',
+            }]}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+            >
+                <View style={[{
+                    display: 'flex', justifyContent: 'center',
+                    alignContent: 'flex-start', width: '100%', flexDirection: 'row', height: '100%'
+                }]}>
+                    <View style={styles.container}>
+                        <View style={[{
                             display: 'flex', justifyContent: 'space-between', flexDirection: 'row',
-                            borderRadius: 8
-                        }]}
-                            onPress={() => {
-                                dispatch(toggleIsOpenAddAppointmentBox())
-                            }}
-                        >
-                            <Icons name='plus' size={20} color={'white'} />
-                            <Text style={[{ fontSize: 16, color: '#fff', marginLeft: 6 }]}>Add new</Text>
-                        </TouchableOpacity>
-                    </View>
+                            width: '100%', alignItems: 'center', marginTop: 16, height: 60
+                        }]}>
+                            <Text style={[styles.title, { marginTop: 10 }]}>Appointments</Text>
+                        </View>
 
-                    <View style={[{
-                        display: 'flex', justifyContent: 'center', flexDirection: 'row',
-                        marginTop: 10
-                    }]}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Search appointments(yyyy/MM/dd)..."
-                            value={searchAppointmentValue}
-                            onChangeText={(text) => { setSearchAppointmentValue(text) }}
-                        />
-                    </View>
+                        <View style={[{
+                            display: 'flex', justifyContent: 'center', flexDirection: 'row',
+                            marginTop: 10
+                        }]}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Search appointments(yyyy/MM/dd)..."
+                                value={searchAppointmentValue}
+                                onChangeText={(text) => { setSearchAppointmentValue(text) }}
+                            />
+                        </View>
 
-                    {searchAppointmentValue !== '' ?
-                        <Text style={[{ fontSize: 18, marginBottom: 10 }]}>
-                            <Text style={[{ fontWeight: 'bold', fontSize: 20 }]}>Results for: </Text>
-                            {searchAppointmentValue}
-                        </Text> :
-                        <Text style={[{ fontSize: 18, marginBottom: 4 }]}>
-                            <Text style={[{ fontWeight: 'bold', fontSize: 20 }]}>Today: </Text>
-                            {format(new Date(), 'dd/MM/yyyy')}
-                        </Text>
-                    }
+                        {searchAppointmentValue !== '' ?
+                            <Text style={[{ fontSize: 18, marginBottom: 10 }]}>
+                                <Text style={[{ fontWeight: 'bold', fontSize: 20 }]}>Results for: </Text>
+                                {searchAppointmentValue}
+                            </Text> :
+                            <Text style={[{ fontSize: 18, marginBottom: 4 }]}>
+                                <Text style={[{ fontWeight: 'bold', fontSize: 20 }]}>Today: </Text>
+                                {format(new Date(), 'dd/MM/yyyy')}
+                            </Text>
+                        }
 
-                    <View style={[{ marginLeft: 10, marginRight: 10 }]}>
+                        <View style={[{ marginLeft: 10, marginRight: 10 }]}>
+                            {
+                                searchedAppointments.length > 0 &&
+                                searchedAppointments.map(appointment => {
+                                    const { id, scheduled_time, confirmed, reason } = appointment
+                                    return (
+                                        <UpdateAppointmentItem key={id} scheduled_time={scheduled_time} id={id}
+                                            confirmed={confirmed} reason={reason} 
+                                        />
+                                    )
+                                })
+                            }
+                        </View>
                         {
-                            searchedAppointments.length > 0 &&
-                            searchedAppointments.map(appointment => {
-                                const { id, scheduled_time, confirmed, reason } = appointment
-                                return (
-                                    <AppointmentItem key={id} scheduled_time={scheduled_time} id={id}
-                                        confirmed={confirmed} reason={reason}
-                                    />
-                                )
-                            })
+                            isLoading &&
+                            <ActivityIndicator size="large" color="#0000ff" />
                         }
                     </View>
-                    {
-                        isLoading &&
-                        <ActivityIndicator size="large" color="#0000ff" />
-                    }
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </GestureHandlerRootView>
     );
 }
 

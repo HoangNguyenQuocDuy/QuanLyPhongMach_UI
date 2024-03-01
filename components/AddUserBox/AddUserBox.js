@@ -384,7 +384,7 @@ function AddUserBox() {
                             flexDirection: 'row', width: '100%', marginBottom: 20,
                         }]}>
                             <TouchableOpacity style={[styles.button, { backgroundColor: '#6895D2', width: 160 }]} onPress={handleSubmit}>
-                                <Text style={styles.buttonText}>Create medicine</Text>
+                                <Text style={styles.buttonText}>Create</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

@@ -80,9 +80,6 @@ const Register = ({ navigation }) => {
             dispatch(createPatient({ data:formData }))
             .then(data => {
                 console.log('Data from register: ', data.payload)
-                dispatch(setIsAlreadyRegister(true))
-                dispatch(setNewUsernameRegister(formData._parts.username))
-                dispatch(setNewPasswordRegister(formData._parts.password))
                 gotoLogin()
             })
             .catch(err => {
@@ -289,7 +286,7 @@ const Register = ({ navigation }) => {
                                 Already have an account?
                             </Text>
                             <TouchableOpacity onPress={gotoLogin}>
-                                <Text style={[{ fontSize: 16, color: '#fa6a67', marginLeft: 4 }]}
+                                <Text style={[{ fontSize: 16, color: '#50C4ED', marginLeft: 4 }]}
                                 >Log in
                                 </Text>
                             </TouchableOpacity>
@@ -340,8 +337,8 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     button: {
-        width: '30%',
-        backgroundColor: '#fa6a67',
+        width: '70%',
+        backgroundColor: '#387ADF',
         height: 38,
         borderRadius: 8,
         display: 'flex',
@@ -351,7 +348,8 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: 'white',
-        fontSize: 16
+        fontSize: 16,
+        fontWeight:'500'
     },
     picker: {
         borderRadius: 100,

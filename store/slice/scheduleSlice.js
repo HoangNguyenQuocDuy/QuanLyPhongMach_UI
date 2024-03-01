@@ -136,12 +136,17 @@ export const scheduleSlice = createSlice({
                 }
             }),
             builder.addCase(createSchedule.fulfilled, (state, action) => {
-                return {
-                    ...state,
-                    results: [
-                        ...state.results,
-                        ...action.payload
-                    ]
+                if (Object.keys(state).length > 0) {
+                    return {
+                        ...state,
+                        count: state.count + 1,
+                        results: [...state.results, action.payload]
+                    };
+    
+                } else {
+                    return {
+                        results: [action.payload]
+                    }
                 }
             })
     }

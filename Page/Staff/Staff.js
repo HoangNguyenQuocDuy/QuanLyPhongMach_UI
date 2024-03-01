@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDoctorsData } from "../../store/slice/doctorsSlice";
+import { addNewDoctors, fetchDoctorsData } from "../../store/slice/doctorsSlice";
 import UserTag from "../../components/UserTag/UserTag";
 import Icons from 'react-native-vector-icons/Entypo'
 import { useDebounce } from 'use-debounce';
 import newRequest from "../../ultils/request";
 import { setIsOpenAddUserBox, setTitleAddUserBox } from "../../store/slice/appSlice";
-import { fetchNursesData } from "../../store/slice/nurseSlice";
+import { addNewNurses, fetchNursesData } from "../../store/slice/nurseSlice";
 
 function Staff() {
     const dispatch = useDispatch()
@@ -27,25 +27,25 @@ function Staff() {
     const [nursesSearch, setNursesSearch] = useState([])
 
     useEffect(() => {
-        // if (fetchedDoctor) {
-        //     dispatch(fetchDoctorsData({ access_token }))
-        //         .then(data => {
-        //             setFetchedDoctor(false)
-        //         })
-        //         .catch(err => {
-        //             console.log('Error when trying get doctor: ', err)
-        //         })
-        // }
-        // if (fetchedNurse) {
-        //     dispatch(fetchNursesData({ access_token }))
-        //         .then(data => {
-        //             setFetchedNurse(false)
-        //         })
-        //         .catch(err => {
-        //             console.log('Error when trying get doctor: ', err)
-        //         })
+        if (fetchedDoctor) {
+            dispatch(fetchDoctorsData({ access_token }))
+                .then(data => {
+                    setFetchedDoctor(false)
+                })
+                .catch(err => {
+                    console.log('Error when trying get doctor: ', err)
+                })
+        }
+        if (fetchedNurse) {
+            dispatch(fetchNursesData({ access_token }))
+                .then(data => {
+                    setFetchedNurse(false)
+                })
+                .catch(err => {
+                    console.log('Error when trying get doctor: ', err)
+                })
 
-        // }
+        }
 
         if (searchDoctorValue !== '') {
             const handleSearchDoctor = async () => {
@@ -55,6 +55,7 @@ function Staff() {
                     }
                 })
                     .then(data => {
+                        dispatch(addNewDoctors(data.data))
                         setDoctorsSearch(data.data)
                     })
                     .catch(err => {
@@ -74,6 +75,7 @@ function Staff() {
                     }
                 })
                     .then(data => {
+                        dispatch(addNewNurses(data.data))
                         setNursesSearch(data.data)
                     })
                     .catch(err => {
@@ -149,11 +151,11 @@ function Staff() {
                                     doctorsSearch && doctorsSearch.map(doctor => (
                                         <UserTag
                                             key={doctor.id}
-                                            first_name={doctor.user.first_name}
-                                            last_name={doctor.user.last_name}
-                                            avatar={doctor.user.avatar}
+                                            first_name={doctor.user && doctor.user.first_name}
+                                            last_name={doctor.user&&doctor.user.last_name}
+                                            avatar={doctor.user&&doctor.user.avatar}
                                             speciality={doctor.speciality}
-                                            username={doctor.user.username}
+                                            username={doctor.user&&doctor.user.username}
                                             id={doctor.id}
                                         />
                                     ))
@@ -161,11 +163,11 @@ function Staff() {
                                         if (doctor) {
                                             return <UserTag
                                                 key={doctor.id}
-                                                first_name={doctor.user.first_name}
-                                                last_name={doctor.user.last_name}
-                                                avatar={doctor.user.avatar}
+                                                first_name={doctor.user && doctor.user.first_name}
+                                                last_name={doctor.user&&doctor.user.last_name}
+                                                avatar={doctor.user&&doctor.user.avatar}
                                                 speciality={doctor.speciality}
-                                                username={doctor.user.username}
+                                                username={doctor.user&&doctor.user.username}
                                                 id={doctor.id}
                                             />
                                         }
@@ -225,11 +227,11 @@ function Staff() {
                                     nursesSearch && nursesSearch.map(nurse => (
                                         <UserTag
                                             key={nurse.id}
-                                            first_name={nurse.user.first_name}
-                                            last_name={nurse.user.last_name}
-                                            avatar={nurse.user.avatar}
+                                            first_name={nurse.user && nurse.user.first_name}
+                                            last_name={nurse.user&&nurse.user.last_name}
+                                            avatar={nurse.user&&nurse.user.avatar}
                                             faculty={nurse.faculty}
-                                            username={nurse.user.username}
+                                            username={nurse.user&&nurse.user.username}
                                             id={nurse.id}
                                         />
                                     ))
@@ -237,11 +239,11 @@ function Staff() {
                                         if (nurse) {
                                             return <UserTag
                                                 key={nurse.id}
-                                                first_name={nurse.user.first_name}
-                                                last_name={nurse.user.last_name}
-                                                avatar={nurse.user.avatar}
+                                                first_name={nurse.user && nurse.user.first_name}
+                                                last_name={nurse.user&&nurse.user.last_name}
+                                                avatar={nurse.user&&nurse.user.avatar}
                                                 faculty={nurse.faculty}
-                                                username={nurse.user.username}
+                                                username={nurse.user&&nurse.user.username}
                                                 id={nurse.id}
                                             />
                                         }

@@ -136,7 +136,7 @@ function SearchMedicines({ medicinesPres, setMedicinesPres }) {
                         medicinesPres.length > 0 &&
                         medicinesPres.map(medicine => {
                             let image = ''
-                            if (medicine.image.startsWith('image/upload/')) {
+                            if (medicine.image!==''&& medicine.image.startsWith('image/upload/')) {
                                 image = medicine.image.substring(medicine.image.indexOf('image/upload/') + 'image/upload/'.length)
                             } else {
                                 image = medicine.image

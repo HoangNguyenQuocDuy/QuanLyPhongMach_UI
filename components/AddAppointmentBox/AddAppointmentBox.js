@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { format } from "date-fns"
@@ -10,7 +10,7 @@ import Icons5 from 'react-native-vector-icons/Fontisto'
 import { GestureHandlerRootView, ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { createAppointment } from "../../store/slice/appointmentsSlice";
-import { toggleIsOpenAddAppointmentBox } from "../../store/slice/appSlice";
+import { setIsReloadAppointment } from "../../store/slice/appSlice";
 
 function AddAppointmentBox() {
     const user = useSelector(state => state.user)
@@ -26,6 +26,7 @@ function AddAppointmentBox() {
     const hours = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
         '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30']
     const [reason, setReason] = useState('')
+    const [isCreateSuccessful, setIsCreateSuccessful] = useState(false)
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || birth;
@@ -59,13 +60,29 @@ function AddAppointmentBox() {
             dispatch(createAppointment({ access_token, data }))
                 .then(data => {
                     console.log('create appointment successful: ', data.payload)
-                    dispatch(toggleIsOpenAddAppointmentBox())
+                    setReason('')
+                    setActiveIndex()
+                    setIsCreateSuccessful(true)
+                    dispatch(setIsReloadAppointment(true))
                 })
                 .catch(err => {
                     console.log('err when create appointment: ', err)
                 })
         }
     }
+
+    useEffect(() => {
+        let timer
+        if (isCreateSuccessful) {
+            timer = setTimeout(() => {
+                setIsCreateSuccessful(false)
+            })
+        }
+
+        return(() => {
+            clearTimeout(timer)
+        })
+    }, [isCreateSuccessful])
 
     return (
         <GestureHandlerRootView>
@@ -92,10 +109,10 @@ function AddAppointmentBox() {
                                 </View>
                                 <View style={[styles.flex,{ width: '100%', position: 'relative' }]}>
                                     <TextInput
-                                        style={[styles.input, email !== '' && styles.inputActive]}
+                                        style={[styles.input, user.email !== '' && styles.inputActive]}
                                         placeholder="Email..."
                                         name='email'
-                                        value={email}
+                                        value={user.email}
                                         editable={false}
                                     />
                                     <View style={[{
@@ -198,6 +215,10 @@ function AddAppointmentBox() {
                         </View>
                     </ScrollView>
 
+                    {
+                        isCreateSuccessful && <Text style={styles.success}>Booking successful!</Text>
+                    }
+
                     <TouchableOpacity onPress={handleCreateAppointment} style={[styles.button]}>
                         <Text style={[styles.buttonText]}>
                             Booking
@@ -210,6 +231,10 @@ function AddAppointmentBox() {
 }
 
 const styles = StyleSheet.create({
+    success: {
+        fontSize:18,
+        color: '#74E291',
+    },
     wrapper: {
         backgroundColor: '#fff',
         width: '100%',

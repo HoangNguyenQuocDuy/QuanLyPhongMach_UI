@@ -149,14 +149,17 @@ export const appointmentsSlice = createSlice({
                 }
             }),
             builder.addCase(createAppointment.fulfilled, (state, action) => {
-                console.log('state ', state)
-                console.log('action ', action.payload)
-                return {
-                    ...state,
-                    results: [
-                        ...state.results,
-                        action.payload.data
-                    ]
+                if (Object.keys(state).length > 0) {
+                    return {
+                        ...state,
+                        count: state.count + 1,
+                        results: [...state.results, action.payload]
+                    };
+
+                } else {
+                    return {
+                        results: [action.payload]
+                    }
                 }
             })
     }

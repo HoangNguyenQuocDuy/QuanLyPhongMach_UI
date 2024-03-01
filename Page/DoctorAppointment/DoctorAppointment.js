@@ -11,6 +11,7 @@ import { Platform } from "react-native";
 import { Shadow } from "react-native-shadow-2";
 import AppointmentItem from "../../components/AppointmentItem/AppointmentItem";
 import UpdateAppointmentItem from "../../components/UpdateAppointmentItem/UpdateAppointmentItem";
+import { setIsReloadAppointment } from "../../store/slice/appSlice";
 
 function DoctorAppointment({ navigation }) {
     const dispatch = useDispatch()
@@ -23,6 +24,7 @@ function DoctorAppointment({ navigation }) {
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [searchedAppointments, setSearchedAppointments] = useState([])
     const [isNext, setIsNext] = useState(true)
+    const { isReloadAppointment } = useSelector(state => state.app)
 
     const findAppointments = async () => {
         const handleGetSearchAppointments = async () => {
@@ -103,13 +105,14 @@ function DoctorAppointment({ navigation }) {
     }
 
     useEffect(() => {
-        if (debounceSearchSchValue !== ''
+        if (debounceSearchSchValue !== '' || isReloadAppointment
         ) {
+            if (isReloadAppointment) dispatch(setIsReloadAppointment(false))
             console.log('debouncedSearchScheduleValue ', debounceSearchSchValue)
             findAppointments()
         }
 
-    }, [debounceSearchSchValue])
+    }, [debounceSearchSchValue, isReloadAppointment])
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;

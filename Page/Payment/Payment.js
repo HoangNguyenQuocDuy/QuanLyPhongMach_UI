@@ -1,41 +1,38 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Icons2 from 'react-native-vector-icons/MaterialCommunityIcons'
-import DateTimePicker from '@react-native-community/datetimepicker'
-import { format } from 'date-fns'
-import { Shadow } from 'react-native-shadow-2'
-import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import { useDebounce } from "use-debounce";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Shadow } from "react-native-shadow-2";
 import moment from "moment";
-import { fetchAppointmentsData } from "../../store/slice/appointmentsSlice";
-import UpdateAppointmentItem from "../../components/UpdateAppointmentItem/UpdateAppointmentItem";
-import { setIsReloadAppointment } from "../../store/slice/appSlice";
+import Icons2 from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useDebounce } from "use-debounce";
+import { Platform } from "react-native";
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPayments } from "../../store/slice/paymentsSlice";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
+import PaymentItem from "../../components/PaymentItem/PaymentItem";
 
-function ManageAppointment() {
+function Payment() {
     const dispatch = useDispatch()
     const { access_token } = useSelector(state => state.account)
     const [date, setDate] = useState(new Date())
-    const [debounceSearchSchValue] = useDebounce(moment(date).format('yyyy-MM-DD'), 2000)
-    const [showDatePicker, setShowDatePicker] = useState(false)
-    const [isFetch, setIsFetch] = useState()
-    const [searchedAppointments, setSearchedAppointments] = useState()
+    const [debounceSearchValue] = useDebounce(moment(date).format('yyyy-MM-DD'), 2000)
     const [isLoading, setIsLoading] = useState(false)
+    const [showDatePicker, setShowDatePicker] = useState(false)
     const [isNext, setIsNext] = useState(false)
     const [page, setPage] = useState(1)
-    const { isReloadAppointment } = useSelector(state => state.app)
+    const [payments, setPayments] = useState([])
+    const [isUpdateSuccess, setIsUpdateSuccess] = useState(false)
 
-    const findAppointments = async () => {
-        // if (!isFetch) {
-        const handleGetSearchAppointments = async () => {
+    const findPayments = async () => {
+        const handleGetSearchPayments = async () => {
             setIsLoading(true)
-            dispatch(fetchAppointmentsData({
-                access_token, date: debounceSearchSchValue, page: 1
+            dispatch(fetchPayments({
+                access_token, date: debounceSearchValue, page: 1
             }))
                 .then(data => {
-                    setSearchedAppointments([...data.payload.results])
+                    console.log('payments: ', data.payload)
+                    setPayments([...data.payload.results])
                     setIsLoading(false)
-                    setIsFetch(true)
                     if (data.payload.next) {
                         setPage(2)
                         setIsNext(true)
@@ -45,34 +42,33 @@ function ManageAppointment() {
                 })
                 .catch(err => {
                     setIsLoading(false)
-                    console.log('Error when get appointments from page number: ', err)
+                    console.log('Error when get payments from page number: ', err)
                 })
         }
-        handleGetSearchAppointments()
-        // }
+        handleGetSearchPayments()
     }
 
-    const loadNewAppointments = async () => {
-        if (debounceSearchSchValue !== '') {
+    const loadNewPayments = async () => {
+        if (debounceSearchValue !== '') {
             console.log('page ', page)
             if (isNext) {
                 setIsLoading(true)
-                const handleGetSearchAppointments = async () => {
-                    dispatch(fetchAppointmentsData({
-                        access_token, date: debounceSearchSchValue, page
+                const handleGetSearchPayments = async () => {
+                    dispatch(fetchPayments({
+                        access_token, date: debounceSearchValue, page
                     }))
                         .then(data => {
-                            // dispatch(addNewAppointments(data.data))
-                            setSearchedAppointments(state => {
-                                const exitingIds = state.map(appointment => appointment.id)
-                                const newAppointments = data.payload.results.filter(
-                                    appointment => {
-                                        return !exitingIds.includes(appointment.id)
+                            console.log('payment ', data.payload)
+                            payments(state => {
+                                const exitingIds = state.map(payment => payment.id)
+                                const newPayments = data.payload.results.filter(
+                                    payment => {
+                                        return !exitingIds.includes(payment.id)
                                     }
                                 )
                                 return [
                                     ...state,
-                                    ...newAppointments
+                                    ...newPayments
                                 ]
                             })
                             setIsLoading(false)
@@ -86,10 +82,10 @@ function ManageAppointment() {
                         .catch(err => {
                             setIsLoading(false)
                             setIsNext(false)
-                            console.log('Error when get appointments from page number: ', err)
+                            console.log('Error when get payments from page number: ', err)
                         })
                 }
-                handleGetSearchAppointments()
+                handleGetSearchPayments()
             } else {
                 setIsLoading(false)
             }
@@ -102,22 +98,16 @@ function ManageAppointment() {
 
         if (layoutMeasurement.height + contentOffset.y >=
             contentSize.height - paddingToBottom) {
-            loadNewAppointments()
+            loadNewPayments()
         }
     }
 
-    const appointments = useSelector(state => state.appointments)
-
     useEffect(() => {
-        if (debounceSearchSchValue !== '' || isReloadAppointment
-        ) {
-            console.log('debouncedSearchScheduleValue ', debounceSearchSchValue)
-            console.log('dasfdh fa')
-            findAppointments()
-            if (isReloadAppointment) dispatch(setIsReloadAppointment(false))
+        if (isUpdateSuccess) {
+            setIsUpdateSuccess(false)
         }
-
-    }, [debounceSearchSchValue, isReloadAppointment])
+        findPayments()
+    }, [debounceSearchValue, isUpdateSuccess])
 
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || birth;
@@ -128,24 +118,20 @@ function ManageAppointment() {
             setDate(localDate);
         }
         setShowDatePicker(Platform.OS === 'ios');
-        // setShowDatePicker(false);
     }
-
-
 
     return (
         <GestureHandlerRootView>
             <View style={styles.wrapper}>
                 <View style={styles.container}>
-
                     <View style={[{ width: '100%' }]}>
-                        <Text style={[styles.title, { marginTop: 20 }]}>Time appointment</Text>
+                        <Text style={[styles.title, { marginTop: 20 }]}>Time payment</Text>
 
                         <View style={[{ width: '100%', position: 'relative', marginTop: 8 }]}>
                             <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                                 <Shadow distance={16} startColor="#f0eff3">
                                     <Text style={[styles.input, styles.inputActive]}>
-                                        {date ? format(date, 'dd/MM/yyyy') : "Select the time..."}
+                                        {date ? moment.utc(date).format('DD/MM/yyyy') : "Select the time..."}
                                     </Text>
                                 </Shadow>
                                 <View style={[{
@@ -171,24 +157,20 @@ function ManageAppointment() {
                                 />
                             )}
                         </View>
-                        <ScrollView style={[{ height: '82%' }]}
+
+                        <ScrollView style={[{ height: '90%' }]}
                             onScroll={handleScroll} scrollEventThrottle={16}
                         >
-                            {
-                                searchedAppointments && searchedAppointments.map(appointment => {
-                                    const { id, scheduled_time, confirmed, patient, reason } = appointment
-
-                                    return (
-                                        <UpdateAppointmentItem key={id}
-                                            id={id}
-                                            scheduled_time={scheduled_time}
-                                            confirmed={confirmed}
-                                            patient={patient}
-                                            reason={reason}
-                                        />
-                                    )
-                                })
-                            }
+                            <View>
+                                {
+                                    payments.length > 0 &&
+                                    payments.map(payment => (
+                                        <PaymentItem
+                                            created_at={payment.created_at} id={payment.id}
+                                            patient={payment.patient} key={payment.id} reload={setIsUpdateSuccess} />
+                                    ))
+                                }
+                            </View>
                         </ScrollView>
                     </View>
                 </View>
@@ -260,4 +242,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default ManageAppointment;
+export default Payment;

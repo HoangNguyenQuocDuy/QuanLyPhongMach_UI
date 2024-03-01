@@ -5,38 +5,51 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMedicineById } from "../../store/slice/medicineSlice";
 import MedicinePresItem from "../MedicinePresItem/MedicinePresItem";
+import { Shadow } from "react-native-shadow-2";
 
-function MedicalHistoryItem({ doctor, prescribed_medicines, symptoms, conclusion, created_at }) {
+function MedicalHistoryItem({ id, doctor, prescribed_medicines, symptoms, conclusion, created_at }) {
     const dispatch = useDispatch()
     const { access_token } = useSelector(state => state.account)
     const [medicinesPres, setMedicinesPres] = useState([])
+    const [page, setPage] = useState(1)
+    const [isNext, setIsNext] = useState(page < prescribed_medicines.length)
+
+    const handleFetchMedicine = () => {
+        if (isNext) {
+            prescribed_medicines.map(medicine => {
+                dispatch(getMedicineById({ access_token, id: medicine.id }))
+                    .then(data => {
+                        setMedicinesPres(state => [...state, {
+                            name: data.payload.name,
+                            active_substances: data.payload.active_substances,
+                            instructions: medicine.instructions,
+                            usage_instructions: medicine.usage_instructions,
+                            image: data.payload.image,
+                            quantity: medicine.quantity,
+                            days: medicine.days
+                        }])
+                        setPage(page + 1)
+                        setIsNext(page + 1 < prescribed_medicines.length)
+                    })
+                    .catch(err => {
+                        console.log('err when get medicine by id: ', err)
+                    })
+            })
+        }
+    }
 
     useEffect(() => {
-        prescribed_medicines.map(medicine => {
-            dispatch(getMedicineById({ access_token, id: medicine.id }))
-                .then(data => {
-                    setMedicinesPres(state => [...state, {
-                        name: data.payload.name,
-                        active_substances: data.payload.active_substances,
-                        instructions: medicine.instructions,
-                        usage_instructions: medicine.usage_instructions,
-                        image: data.payload.image,
-                        quantity: medicine.quantity,
-                        days: medicine.days
-                    }])
-                })
-                .catch(err => {
-                    console.log('err when get medicine by id: ', err)
-                })
-        })
-    }, [])
+        console.log('---')
+        console.log('prescribed_medicines: ', prescribed_medicines)
+        handleFetchMedicine()
+        // console.log()
+    }, [prescribed_medicines])
 
     return (
-        <View style={styles.wrapper}>
-            {
-                medicinesPres &&
-                <View style={styles.container}>
-                    <View style={[{ width: '86%' }]}>
+        <View style={[styles.wrapper, { marginTop:20 }]}>
+            <View style={styles.container}>
+                <Shadow distance={14} startColor="#f0f2f5" style={styles.shadow}>
+                    <View style={[styles.patientBox, { width: '96%' }]}>
                         <View>
                             <Text style={styles.text}>
                                 <Text style={[{ fontWeight: 'bold' }]}>Date: </Text>
@@ -63,7 +76,7 @@ function MedicalHistoryItem({ doctor, prescribed_medicines, symptoms, conclusion
                                 <Text style={[{ fontWeight: 'bold' }]}> - Speciality: </Text>
                                 {`${doctor.speciality}`}
                             </Text>
-                            <Text style={[styles.text, { fontWeight:'bold' }]}>List of medication:</Text>
+                            <Text style={[styles.text, { fontWeight: 'bold' }]}>List of medication:</Text>
                             {
                                 medicinesPres.map(medicine => {
                                     const { id, name, active_substances, days, quantity,
@@ -81,8 +94,9 @@ function MedicalHistoryItem({ doctor, prescribed_medicines, symptoms, conclusion
                             }
                         </View>
                     </View>
-                </View>
-            }
+                </Shadow>
+            </View>
+
         </View>
     );
 }
@@ -105,16 +119,19 @@ const styles = StyleSheet.create({
     wrapper: {
         backgroundColor: '#fff',
         width: '100%',
-        height: '100%',
         display: 'flex',
         justifyContent: 'center',
         flexDirection: 'row',
+        marginLeft:8
     },
     container: {
         backgroundColor: '#fff',
         display: 'flex',
         alignItems: 'center',
-        width: '100%'
+        justifyContent:'center',
+        flexDirection:'row',
+        width: '100%',
+
     },
     title: {
         fontSize: 24,
@@ -156,7 +173,14 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 16
-    }
+    },
+    patientBox: {
+        width: '100%',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        paddingLeft:20,
+        borderRadius:20,
+    },
 })
 
 export default MedicalHistoryItem;
